@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\muroz\\source\\repos\\disaster-simulation-by-Csharp\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{1BF7E072-5CD2-4740-8919-C8F476BB5DCB}|DisasterSimulation\\DisasterSimulation.csproj|c:\\users\\muroz\\source\\repos\\disaster-simulation-by-csharp\\disastersimulation\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1BF7E072-5CD2-4740-8919-C8F476BB5DCB}|DisasterSimulation\\DisasterSimulation.csproj|solutionrelative:disastersimulation\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\muroz\\source\\repos\\disaster-simulation-by-Csharp\\DisasterSimulation\\Program.cs",
+              "RelativeDocumentMoniker": "DisasterSimulation\\Program.cs",
+              "ToolTip": "C:\\Users\\muroz\\source\\repos\\disaster-simulation-by-Csharp\\DisasterSimulation\\Program.cs",
+              "RelativeToolTip": "DisasterSimulation\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-03T03:49:03.372Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
