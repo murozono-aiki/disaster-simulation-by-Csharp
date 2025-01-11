@@ -1,3 +1,4 @@
 ﻿using DisasterSimulation;
 
-Console.WriteLine("Hello, World!");
+DisasterSimulation.Simulator simulator = new([]);
+simulator.Start(0);
