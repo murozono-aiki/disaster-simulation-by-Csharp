@@ -54,7 +54,7 @@ namespace DisasterSimulation
         readonly static double pressureStiffness = 200; //圧力係数
         readonly static double restDensity = 1000; //静止密度
         readonly static double viscosity = 0.000001f;  // 粘性係数
-        readonly static double attenuationCoefficient = -5;  // ダンパ係数
+        readonly static double attenuationCoefficient = -5;  // ダンパ係数（javascript側と同じ値を用いること）
         readonly static double springConstant = -5;  // ばね係数
 
         readonly double densityCoef = particleMass * 315 / (64 * Math.PI * Math.Pow(h, 9)); //密度計算で使う
