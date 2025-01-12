@@ -10,9 +10,6 @@ foreach (FileInfo file in files)
     string json = streamReader.ReadToEnd();
     streamReader.Close();
     FaceData[]? faceDataPart = JsonSerializer.Deserialize<FaceData[]>(json);
-    Console.WriteLine(json);
-    //Console.WriteLine(faceDataPart?[0].triangle[0].x.ToString());
-    //Console.WriteLine(faceDataPart?[0].index.ToString());
 }
 
 DisasterSimulation.Simulator simulator = new([]);

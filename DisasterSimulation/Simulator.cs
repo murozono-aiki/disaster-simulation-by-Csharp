@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using DisasterSimulation;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -13,15 +14,15 @@ namespace DisasterSimulation
 {
     internal class FaceData
     {
-        public int index;
-        public Vector3[] triangle = new Vector3[3];
-        public Vector3 centerOfGravity = new();
-        public Vector3 normalVector = new();
-        public List<InsideJudge> insideJudge = new();
+        [JsonPropertyName("index")] public int Index { get; set; }
+        [JsonPropertyName("triangle")] public Vector3[] Triangle { get; set; }
+        [JsonPropertyName("centerOfGravity")] public Vector3 CenterOfGravity { get; set; }
+        [JsonPropertyName("normalVector")] public Vector3 NormalVector { get; set; }
+        [JsonPropertyName("insideJudge")] public List<InsideJudge> InsideJudges { get; set; }
         public class InsideJudge
         {
-            public Vector3 point = new();
-            public Vector3 normalVector = new();
+            [JsonPropertyName("point")] public Vector3 Point { get; set; }
+            [JsonPropertyName("normalVector")] public Vector3 NormalVector { get; set; }
         }
     }
 
@@ -176,9 +177,9 @@ namespace DisasterSimulation
 
         static bool Is_inside(Vector3 position, FaceData point)
         {
-            for (int i = 0; i < point.insideJudge.Count; i++)
+            for (int i = 0; i < point.InsideJudges.Count; i++)
             {
-                double dot = Vector3Utility.DotVector3(point.insideJudge[i].normalVector, Vector3Utility.SubVector3(position, point.insideJudge[i].point));
+                double dot = Vector3Utility.DotVector3(point.InsideJudges[i].NormalVector, Vector3Utility.SubVector3(position, point.InsideJudges[i].Point));
                 if (dot < 0) return false;
             }
             return true;
@@ -205,8 +206,8 @@ namespace DisasterSimulation
                     FaceData nowPoint = data[j];
                     if (Is_inside(nowParticle.position, nowPoint))
                     {
-                        double distance = Vector3Utility.DotVector3(Vector3Utility.SubVector3(nowParticle.position, nowPoint.centerOfGravity), nowPoint.normalVector);
-                        Vector3 nowTerm = Vector3Utility.MultiplyScalarVector3(nowPoint.normalVector, springConstant * distance + attenuationCoefficient * Vector3Utility.DotVector3(nowParticle.velocity, nowPoint.normalVector));
+                        double distance = Vector3Utility.DotVector3(Vector3Utility.SubVector3(nowParticle.position, nowPoint.CenterOfGravity), nowPoint.NormalVector);
+                        Vector3 nowTerm = Vector3Utility.MultiplyScalarVector3(nowPoint.NormalVector, springConstant * distance + attenuationCoefficient * Vector3Utility.DotVector3(nowParticle.velocity, nowPoint.NormalVector));
                         term = Vector3Utility.AddVector3(term, nowTerm);
                     }
                 }
