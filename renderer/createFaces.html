@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面データ出力 - 災害シミュレーション</title>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./three/build/three.module.js",
+                "three/addons/": "./three/examples/jsm/"
+            }
+        }
+    </script>
+    <script src="./simulator.js"></script>
+    <script type="module" src="./createFaces.js"></script>
+</head>
+<body>
+    <a id="downloadLink">ファイル生成中...</a>
+    <canvas id="canvas" width="1280" height="720"></canvas>
+</body>
+</html>
