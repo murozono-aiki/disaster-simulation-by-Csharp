@@ -4,17 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DisasterSimulation
 {
-    internal class Vector3(double x = 0, double y = 0, double z = 0)
+    public class Vector3(double x = 0, double y = 0, double z = 0)
     {
         [JsonPropertyName("x")] public double X { get; set; } = x;
         [JsonPropertyName("y")] public double Y { get; set; } = y;
         [JsonPropertyName("z")] public double Z { get; set; } = z;
     }
-    internal static class Vector3Utility
+    public static class Vector3Utility
     {
         public static Vector3 AddVector3(Vector3 a, Vector3 b)
         {
