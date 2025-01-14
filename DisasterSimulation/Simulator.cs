@@ -15,7 +15,7 @@ namespace DisasterSimulation
     public class Result
     {
         [JsonPropertyName("time")] public required double Time { get; set; }
-        [JsonPropertyName("particlePositions")] public required Vector3[] ParticlePositions { get; set; }
+        [JsonPropertyName("particlePositions")] public required Vector3?[] ParticlePositions { get; set; }
     }
 
     public class Setting
@@ -291,7 +291,7 @@ namespace DisasterSimulation
             return Task.WhenAll(tasks);
         }
 
-        Vector3[] Tick()
+        Vector3?[] Tick()
         {
             for (int i = 0; i < _particles.Count; i++)
             {
@@ -306,7 +306,7 @@ namespace DisasterSimulation
             CalcViscosityTerm(_particles).Wait();
             CalcColiderTerm(_particles).Wait();
 
-            List<Vector3> tickResult = new();
+            List<Vector3?> tickResult = new();
             for (int i = 0; i < _particles.Count; i++)
             {
                 Particle nowParticle = _particles[i];
@@ -347,7 +347,7 @@ namespace DisasterSimulation
                 double time = (i + 1) * deltaTime;
                 string reportHeader = time + "秒目/" + simulateSeconds + "秒 ";
                 Console.WriteLine(reportHeader);
-                Vector3[] particlePositions = Tick();
+                Vector3?[] particlePositions = Tick();
                 Result tickResult = new()
                 {
                     Time = time,
