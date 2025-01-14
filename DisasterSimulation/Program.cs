@@ -28,17 +28,19 @@ foreach (FaceData[] faceDataPart in faceDataParts)
 faceData.Sort((a, b) => a.Index - b.Index);
 
 DisasterSimulation.Simulator simulator = new(faceData.ToArray());
-simulator.Start(2.8);
+simulator.Start(70);
 List<Result> result = simulator.result;
 
 Console.WriteLine("シミュレーション結果を書き込み中...");
 int lengthPerFile = 10;
 List<Task> writeTasks = new();
+List<String> fileNames = new();
 for (int i = 0; i < result.Count; i += lengthPerFile)
 {
     List<Result> resultPart = result.GetRange(i, Math.Min(lengthPerFile, result.Count - i));
     string resultJson = JsonSerializer.Serialize<Result[]>(resultPart.ToArray());
     StreamWriter streamWriter = new($"../../../../source/output/result{i}.json");
+    fileNames.Add($"result{i}.json");
     Task task = Task.Run(() =>
     {
         streamWriter.Write(resultJson);
@@ -46,4 +48,12 @@ for (int i = 0; i < result.Count; i += lengthPerFile)
     });
     writeTasks.Add(task);
 }
+string fileNamesJson = JsonSerializer.Serialize(fileNames.ToArray());
+StreamWriter fileNamesStreamWriter = new("../../../../source/output/fileNames.json");
+Task fileNamesTask = Task.Run(() =>
+{
+    fileNamesStreamWriter.Write(fileNamesJson);
+    fileNamesStreamWriter.Flush();
+});
+writeTasks.Add(fileNamesTask);
 Task.WaitAll(writeTasks.ToArray());

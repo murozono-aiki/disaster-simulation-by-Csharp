@@ -113,7 +113,7 @@ async function init() {
     const zipFileWriter = new BlobWriter('application/json');
     const textReaders = [];
     while (normalVectors.length > 0) {
-        const array = normalVectors.splice(0, 100000);
+        const array = normalVectors.splice(0, 70000);
         const json = JSON.stringify(array);
         const textReader = new TextReader(json);
         textReaders.push(textReader);
@@ -151,6 +151,15 @@ function createNormalVectors(geometry) {
         }
 
         const insideJudge = [];
+        const attenuationCoefficient = -5;  // ダンパ係数
+        insideJudge.push({
+            point: addVector3(point1, multiplyScalarVector3(normalVector, -attenuationCoefficient)),
+            normalVector: multiplyScalarVector3(normalVector, -1)
+        });
+        insideJudge.push({
+            point: subVector3(point1, multiplyScalarVector3(normalVector, -attenuationCoefficient)),
+            normalVector: normalVector
+        });
         insideJudge.push({
             point: point1,
             normalVector: normalVector.clone().cross(point2.clone().sub(point1.clone())).normalize()
@@ -173,4 +182,34 @@ function createNormalVectors(geometry) {
         });
     }
     return result;
+}
+
+/**
+ * ベクトルについて a + b を計算する関数
+ * @param {Vector3} a - 足すベクトル
+ * @param {Vector3} b - 足されるベクトル
+ * @returns {Vector3} - ベクトルの和
+ */
+function addVector3(a, b) {
+    return createVector3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+/**
+ * ベクトルについて a - b を計算する関数
+ * @param {Vector3} a - 引かれるベクトル
+ * @param {Vector3} b - 引くベクトル
+ * @returns {Vector3} - ベクトルの差
+ */
+function subVector3(a, b) {
+    return createVector3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+/**
+ * ベクトルについて aのn倍 を計算する関数
+ * @param {Vector3} a - ベクトル
+ * @param {number} n - 実数（スカラー）
+ * @returns {Vector3} - 実数倍したベクトル
+ */
+function multiplyScalarVector3(a, n) {
+    return createVector3(n * a.x, n * a.y, n * a.z);
 }
