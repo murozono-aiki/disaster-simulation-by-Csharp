@@ -110,6 +110,11 @@ async function init() {
     const normalVectors_sortY = normalVectors.toSorted((a, b) => a.centerOfGravity.y - b.centerOfGravity.y);
     const normalVectors_sortZ = normalVectors.toSorted((a, b) => a.centerOfGravity.z - b.centerOfGravity.z);
 
+    const particle = createParticleGeometry();
+    particle.position.x = -700;
+    particle.position.y = 45;
+    particle.position.z = 2303;
+
     const zipFileWriter = new BlobWriter('application/json');
     const textReaders = [];
     while (normalVectors.length > 0) {
@@ -128,7 +133,7 @@ async function init() {
     const anchor = document.getElementById("downloadLink");
     anchor.download = `face-data.zip`;
     anchor.href = url;
-    anchor.textContent = "面データをダウンロード"
+    anchor.textContent = "面データをダウンロード";
 }
 init();
 
@@ -151,15 +156,24 @@ function createNormalVectors(geometry) {
         }
 
         const insideJudge = [];
-        const attenuationCoefficient = -5;  // ダンパ係数
+        const dampingCoefficient = -5;  // ダンパ係数
+        const height = 5;  // 最大食い込み量（食い込んでいる面を特定するために用いる）←他の方法が望ましいが、簡略化のため
         insideJudge.push({
-            point: addVector3(point1, multiplyScalarVector3(normalVector, -attenuationCoefficient)),
+            point: point1,
             normalVector: multiplyScalarVector3(normalVector, -1)
         });
         insideJudge.push({
-            point: subVector3(point1, multiplyScalarVector3(normalVector, -attenuationCoefficient)),
+            point: subVector3(point1, multiplyScalarVector3(normalVector, height)),
             normalVector: normalVector
         });
+        /*insideJudge.push({
+            point: addVector3(point1, multiplyScalarVector3(normalVector, -dampingCoefficient)),
+            normalVector: multiplyScalarVector3(normalVector, -1)
+        });
+        insideJudge.push({
+            point: subVector3(point1, multiplyScalarVector3(normalVector, -dampingCoefficient)),
+            normalVector: normalVector
+        });*/
         insideJudge.push({
             point: point1,
             normalVector: normalVector.clone().cross(point2.clone().sub(point1.clone())).normalize()
@@ -182,6 +196,14 @@ function createNormalVectors(geometry) {
         });
     }
     return result;
+}
+
+function createParticleGeometry() {
+    const geometry = new THREE.SphereGeometry(3, 3, 2);
+    const material = new THREE.MeshStandardMaterial({color: 0x0000FF});
+    const sphere = new THREE.Mesh(geometry, material);
+    scene.add(sphere);
+    return sphere;
 }
 
 /**
