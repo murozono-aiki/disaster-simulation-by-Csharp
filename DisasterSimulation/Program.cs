@@ -28,7 +28,7 @@ foreach (FaceData[] faceDataPart in faceDataParts)
 faceData.Sort((a, b) => a.Index - b.Index);
 
 DisasterSimulation.Simulator simulator = new(faceData.ToArray());
-simulator.Start(70);
+simulator.Start(9/*70*/);
 List<Result> result = simulator.result;
 
 Console.WriteLine("シミュレーション結果を書き込み中...");

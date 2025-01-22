@@ -39,8 +39,8 @@ namespace DisasterSimulation
         [JsonPropertyName("viscosity")]
         public required double Viscosity { get; set; }  // 粘性係数
 
-        [JsonPropertyName("attenuationCoefficient")]
-        public required double AttenuationCoefficient { get; set; }  // ダンパ係数
+        [JsonPropertyName("dampingCoefficient")]
+        public required double DampingCoefficient { get; set; }  // ダンパ係数
 
         [JsonPropertyName("springConstant")]
         public required double SpringConstant { get; set; }  // ばね係数
@@ -78,42 +78,39 @@ namespace DisasterSimulation
             public Vector3 coliderTerm = new();
         }
 
-        internal List<Result> result = new();
+        internal List<Result> result = [];
 
         readonly FaceData[] data = data;
 
-        Dictionary<int, Term> terms = new();
+        readonly Dictionary<int, Term> terms = [];
 
-        readonly static double h = 0.3/* 0.012 */; //影響半径
-        readonly static double particleMass = 0.0002; //粒子の質量
+        readonly static double h = 2/*0.3*//* 0.012 */; //影響半径
+        readonly static double particleMass = 9/*0.0002*/; //粒子の質量
 
         readonly static Vector3 g = new(0, -9.8, 0);  // 重力加速度
         readonly static double pressureStiffness = 200; //圧力係数
         readonly static double restDensity = 1000; //静止密度
         readonly static double viscosity = 0.000001;  // 粘性係数
-        readonly static double attenuationCoefficient = -5;  // ダンパ係数（javascript側と同じ値を用いること）
-        readonly static double springConstant = -5;  // ばね係数
+        readonly static double dampingCoefficient = 0.1;  // ダンパ係数
+        readonly static double springConstant = 100;  // ばね係数
 
         readonly double densityCoef = particleMass * 315 / (64 * Math.PI * Math.Pow(h, 9)); //密度計算で使う
 
         readonly double pressureCoef = particleMass * 45 / (Math.PI * Math.Pow(h, 6)); //圧力項計算で使う
         readonly double viscosityCoef = viscosity * particleMass * 45 / (Math.PI * Math.Pow(h, 6)); //粘性項計算で使う
 
-        List<Particle> _particles = new();
+        readonly List<Particle> _particles = [];
         readonly static double deltaTime = 0.1;
 
         Task CalcDensity(List<Particle> particles)
         {
-            List<Task> tasks = new();
+            List<Task> tasks = [];
             double h2 = h * h; //事前にhの二乗を計算しておく
             for (int i = 0; i < particles.Count; i++)
             { //一つづつ粒子の密度を計算
                 int index = i;
                 Task task = Task.Run(() =>
                 {
-
-                    //reportProgress(reportHeader + "密度を計算中..." + i + "/" + particles.Count);
-
                     Particle nowParticle = particles[index]; //今回計算する粒子
                     double sum = 0; //足し合わせる変数
                     for (int j = 0; j < particles.Count; j++)
@@ -139,17 +136,14 @@ namespace DisasterSimulation
             return Task.WhenAll(tasks);
         }
 
-        Task CalcPressure(List<Particle> particles)
+        static Task CalcPressure(List<Particle> particles)
         {
-            List<Task> tasks = new();
+            List<Task> tasks = [];
             for (int i = 0; i < particles.Count; i++)
             { //一つづつ粒子の圧力を計算
                 int index = i;
                 Task task = Task.Run(() =>
                 {
-
-                    //reportProgress(reportHeader + "圧力を計算中..." + i + "/" + particles.Count);
-
                     particles[index].pressure = pressureStiffness * (particles[index].density - restDensity);
                 });
                 tasks.Add(task);
@@ -159,16 +153,13 @@ namespace DisasterSimulation
 
         Task CalcPressureTerm(List<Particle> particles)
         {
-            List<Task> tasks = new();
+            List<Task> tasks = [];
             double h2 = h * h; //事前にhの二乗を計算しておく
             for (int i = 0; i < particles.Count; i++)
             { //一つづつ粒子の密度を計算
                 int index = i;
                 Task task = Task.Run(() =>
                 {
-
-                    //reportProgress(reportHeader + "圧力項を計算中..." + i + "/" + particles.length);
-
                     Particle nowParticle = particles[index]; //今回計算する粒子
                     //if (nowParticle.is_wall) continue;  // 速度の計算や位置の更新をしない粒子の場合スキップ
                     Vector3 sum = new(); //足し合わせる変数
@@ -199,16 +190,13 @@ namespace DisasterSimulation
 
         Task CalcViscosityTerm(List<Particle> particles)
         {
-            List<Task> tasks = new();
+            List<Task> tasks = [];
             double h2 = h * h; //事前にhの二乗を計算しておく
             for (int i = 0; i < particles.Count; i++)
             { //一つづつ粒子の密度を計算
                 int index = i;
                 Task task = Task.Run(() =>
                 {
-
-                    //reportProgress(reportHeader + "粘性項を計算中..." + i + "/" + particles.length);
-
                     Particle nowParticle = particles[index]; //今回計算する粒子
                     //if (nowParticle.is_wall) continue;  // 速度の計算や位置の更新をしない粒子の場合スキップ
                     Vector3 sum = new(); //足し合わせる変数
@@ -250,38 +238,35 @@ namespace DisasterSimulation
         }
         Task CalcColiderTerm(List<Particle> particles)
         {
-            List<Task> tasks = new();
+            List<Task> tasks = [];
             for (int i = 0; i < particles.Count; i++)
             {
                 int index = i;
                 Task task = Task.Run(() =>
                 {
-
-                    //reportProgress(reportHeader + "衝突項を計算中..." + i + "/" + particles.length);
-
                     Particle nowParticle = particles[index]; //今回計算する粒子
                     Vector3 term = new();
 
                     /*Dictionary<int, bool> filterArray = [];
-                    filterPoint(filterArray, data.normalVectors.sort.x, nowParticle.position.x - (-attenuationCoefficient), nowParticle.position.x + (-attenuationCoefficient), "x");
-                    filterPoint(filterArray, data.normalVectors.sort.y, nowParticle.position.y - (-attenuationCoefficient), nowParticle.position.y + (-attenuationCoefficient), "y");
-                    filterPoint(filterArray, data.normalVectors.sort.z, nowParticle.position.z - (-attenuationCoefficient), nowParticle.position.z + (-attenuationCoefficient), "z");*/
+                    filterPoint(filterArray, data.normalVectors.sort.x, nowParticle.position.x - (-dampingCoefficient), nowParticle.position.x + (-dampingCoefficient), "x");
+                    filterPoint(filterArray, data.normalVectors.sort.y, nowParticle.position.y - (-dampingCoefficient), nowParticle.position.y + (-dampingCoefficient), "y");
+                    filterPoint(filterArray, data.normalVectors.sort.z, nowParticle.position.z - (-dampingCoefficient), nowParticle.position.z + (-dampingCoefficient), "z");*/
                     for (int j = 0; j < data.Length; j++)
                     {
                         //if (!filterArray[j]) continue;
                         FaceData nowPoint = data[j];
                         if (Is_inside(nowParticle.position, nowPoint))
                         {
-                            double distance = Vector3Utility.DotVector3(Vector3Utility.SubVector3(nowParticle.position, nowPoint.CenterOfGravity), nowPoint.NormalVector);
-                            Vector3 nowTerm = Vector3Utility.MultiplyScalarVector3(nowPoint.NormalVector, springConstant * distance + attenuationCoefficient * Vector3Utility.DotVector3(nowParticle.velocity, nowPoint.NormalVector));
+                            double distance = Math.Abs(Vector3Utility.DotVector3(Vector3Utility.SubVector3(nowParticle.position, nowPoint.CenterOfGravity), nowPoint.NormalVector));
+                            Vector3 nowTerm = Vector3Utility.MultiplyScalarVector3(nowPoint.NormalVector, springConstant * distance + dampingCoefficient * Vector3Utility.DotVector3(nowParticle.velocity, nowPoint.NormalVector));
                             term = Vector3Utility.AddVector3(term, nowTerm);
                         }
                     }
                     terms[index].coliderTerm = term;
 
                     /*let distance = nowParticle.position.y;
-                    if (distance < -attenuationCoefficient) {
-                        terms[i].coliderTerm = multiplyScalarVector3(createVector3(0, 1, 0), springConstant * distance + attenuationCoefficient * dotVector3(nowParticle.velocity, createVector3(0, 1, 0)));
+                    if (distance < -dampingCoefficient) {
+                        terms[i].coliderTerm = multiplyScalarVector3(createVector3(0, 1, 0), springConstant * distance + dampingCoefficient * dotVector3(nowParticle.velocity, createVector3(0, 1, 0)));
                     } else {
                         terms[i].coliderTerm = createVector3();
                     }*/
@@ -306,7 +291,7 @@ namespace DisasterSimulation
             CalcViscosityTerm(_particles).Wait();
             CalcColiderTerm(_particles).Wait();
 
-            List<Vector3?> tickResult = new();
+            List<Vector3?> tickResult = [];
             for (int i = 0; i < _particles.Count; i++)
             {
                 Particle nowParticle = _particles[i];
@@ -319,31 +304,38 @@ namespace DisasterSimulation
                 nowParticle.position = Vector3Utility.AddVector3(nowParticle.position, deltaPosition);
                 tickResult.Add(nowParticle.position);
             }
-            return tickResult.ToArray();
+            _particles.RemoveAll(particle => particle.position.Y <= 0);
+            return [.. tickResult];
         }
 
-        void AddParticles(List<Particle> particles)
+        static void AddParticles(List<Particle> particles)
         {
-            Random random = new();
-            for (int i = 2; i < 2000; i += 2)
+            for (int z = 420; z <= 2303; z += 3)
             {
-                Particle particle = new();
-                particle.position = new Vector3(random.NextDouble() + 0.5, i + 37, 1);
-                particle.velocity = new Vector3(0, -10, 0);
-                particles.Add(particle);
+                for (int y = 45; y <= 50; y += 3)
+                {
+                    Particle particle = new()
+                    {
+                        position = new Vector3(-700, y, z),
+                        velocity = new Vector3(0, 0, 10)
+                    };
+                    particles.Add(particle);
+                }
             }
         }
         public void Start(double simulateSeconds)
         {
             // 初めに実行する処理
             //makeWall(_particles);
-            AddParticles(_particles);
-
-            //self.postMessage({ type: "result", content: _particles, time: 0});
 
             Console.WriteLine("シミュレーション開始");
             for (int i = 0; i < simulateSeconds / deltaTime; i++)
             {
+                if (i % 3  == 0)
+                {
+                    AddParticles(_particles);
+                }
+                
                 double time = (i + 1) * deltaTime;
                 string reportHeader = time + "秒目/" + simulateSeconds + "秒 ";
                 Console.WriteLine(reportHeader);
@@ -354,10 +346,8 @@ namespace DisasterSimulation
                     ParticlePositions = particlePositions
                 };
                 result.Add(tickResult);
-                //self.postMessage({ type: "result", content: _particles, time: time});
             }
 
-            //reportProgress("シミュレーション終了");
         }
     }
 }

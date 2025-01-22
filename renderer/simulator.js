@@ -27,7 +27,7 @@ const g = createVector3(0, -9.8, 0);  // 重力加速度
 const pressureStiffness = 200; //圧力係数
 const restDensity = 1000; //静止密度
 const viscosity = 0.000001;  // 粘性係数
-const attenuationCoefficient = -5;  // ダンパ係数
+const dampingCoefficient = -5;  // ダンパ係数
 const springConstant = -5;  // ばね係数
 
 const densityCoef = particleMass * 315 / (64 * Math.PI * Math.pow(h,9)); //密度計算で使う
@@ -229,7 +229,7 @@ function calcColiderTerm(particles) {
             if (is_inside(nowParticle.position, nowPoint)) {
                 if (!filterArray[j]) console.log("!");
                 let distance = dotVector3(subVector3(nowParticle.position, nowPoint.centerOfGravity), nowPoint.normalVector);
-                let nowTerm = multiplyScalarVector3(nowPoint.normalVector, springConstant * distance + attenuationCoefficient * dotVector3(nowParticle.velocity, nowPoint.normalVector));
+                let nowTerm = multiplyScalarVector3(nowPoint.normalVector, springConstant * distance + dampingCoefficient * dotVector3(nowParticle.velocity, nowPoint.normalVector));
                 term = addVector3(term, nowTerm);
             }
         }
@@ -300,11 +300,11 @@ self.addEventListener("message", event => {
     data = event.data;
     for (let i = 0; i < data.normalVectors.data.length; i++) {
         data.normalVectors.data[i].insideJudge.push({
-            point: addVector3(data.normalVectors.data[i].triangle[0], multiplyScalarVector3(data.normalVectors.data[i].normalVector, -attenuationCoefficient)),
+            point: addVector3(data.normalVectors.data[i].triangle[0], multiplyScalarVector3(data.normalVectors.data[i].normalVector, -dampingCoefficient)),
             normalVector: multiplyScalarVector3(data.normalVectors.data[i].normalVector, -1)
         });
         data.normalVectors.data[i].insideJudge.push({
-            point: subVector3(data.normalVectors.data[i].triangle[0], multiplyScalarVector3(data.normalVectors.data[i].normalVector, -attenuationCoefficient)),
+            point: subVector3(data.normalVectors.data[i].triangle[0], multiplyScalarVector3(data.normalVectors.data[i].normalVector, -dampingCoefficient)),
             normalVector: data.normalVectors.data[i].normalVector
         });
     }
