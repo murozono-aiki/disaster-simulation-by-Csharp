@@ -143,6 +143,7 @@ function createParticleGeometry() {
     scene.add(sphere);
     return sphere;
 }
+/** @type {THREE.Mesh<THREE.SphereGeometry, THREE.MeshStandardMaterial, THREE.Object3DEventMap>[]} */
 const particleGeometries = [];
 
 /** @param {({x:number, y:number, z:number}|null)[]} particlePositions */
@@ -157,7 +158,7 @@ function renderParticles(particlePositions) {
             particleGeometries[i].position.z = particlePositions[i].z;
         } else {
             if (particleGeometries[i]) {
-                particleGeometries[i].dispose();
+                particleGeometries[i].geometry.dispose();
                 particleGeometries[i] = undefined;
             }
         }
