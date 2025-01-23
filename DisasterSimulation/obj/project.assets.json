@@ -142,19 +142,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\happy\\.nuget\\packages\\": {}
+    "C:\\Users\\muroz\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\happy\\github\\disaster-simulation-by-Csharp\\DisasterSimulation\\DisasterSimulation.csproj",
+      "projectUniqueName": "C:\\Users\\muroz\\source\\repos\\disaster-simulation-by-Csharp\\DisasterSimulation\\DisasterSimulation.csproj",
       "projectName": "DisasterSimulation",
-      "projectPath": "C:\\Users\\happy\\github\\disaster-simulation-by-Csharp\\DisasterSimulation\\DisasterSimulation.csproj",
-      "packagesPath": "C:\\Users\\happy\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\happy\\github\\disaster-simulation-by-Csharp\\DisasterSimulation\\obj\\",
+      "projectPath": "C:\\Users\\muroz\\source\\repos\\disaster-simulation-by-Csharp\\DisasterSimulation\\DisasterSimulation.csproj",
+      "packagesPath": "C:\\Users\\muroz\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\muroz\\source\\repos\\disaster-simulation-by-Csharp\\DisasterSimulation\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\happy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\muroz\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -174,7 +179,13 @@
         "warnAsError": [
           "NU1605"
         ]
-      }
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -205,7 +216,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.102/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

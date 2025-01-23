@@ -157,7 +157,7 @@ namespace DisasterSimulation
                      */
 
                     //影響境界が粒子群の内部にあることを確認する
-                    if (particles[i].position.X - h > particleXwithId[particleXwithId.Count].pos)
+                    if (particles[i].position.X - h > particleXwithId[particleXwithId.Count - 1].pos)
                     {
 
                     }
