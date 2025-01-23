@@ -32,10 +32,11 @@
               "RelativeDocumentMoniker": "DisasterSimulation\\Vector3.cs",
               "ToolTip": "C:\\Users\\muroz\\source\\repos\\disaster-simulation-by-Csharp\\DisasterSimulation\\Vector3.cs",
               "RelativeToolTip": "DisasterSimulation\\Vector3.cs",
-              "ViewState": "AgIAABwAAAAAAAAAAAAQwAwAAAAyAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-01-11T07:56:17.749Z",
-              "IsPinned": true
+              "IsPinned": true,
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -45,7 +46,7 @@
               "RelativeDocumentMoniker": "DisasterSimulation\\Simulator.cs",
               "ToolTip": "C:\\Users\\muroz\\source\\repos\\disaster-simulation-by-Csharp\\DisasterSimulation\\Simulator.cs",
               "RelativeToolTip": "DisasterSimulation\\Simulator.cs",
-              "ViewState": "AgIAAHcAAAAAAAAAAAAhwIgAAAA4AAAAAAAAAA==",
+              "ViewState": "AgIAAFUAAAAAAAAAAAAmwGwAAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-01-03T04:44:05.799Z",
               "EditorCaption": ""
@@ -58,9 +59,10 @@
               "RelativeDocumentMoniker": "DisasterSimulation\\Program.cs",
               "ToolTip": "C:\\Users\\muroz\\source\\repos\\disaster-simulation-by-Csharp\\DisasterSimulation\\Program.cs",
               "RelativeToolTip": "DisasterSimulation\\Program.cs",
-              "ViewState": "AgIAABUAAAAAAAAAAAAAAB4AAAARAAAAAAAAAA==",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAAB4AAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-03T03:49:03.372Z"
+              "WhenOpened": "2025-01-03T03:49:03.372Z",
+              "EditorCaption": ""
             }
           ]
         }

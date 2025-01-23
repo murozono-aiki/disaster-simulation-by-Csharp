@@ -28,11 +28,11 @@ foreach (FaceData[] faceDataPart in faceDataParts)
 faceData.Sort((a, b) => a.Index - b.Index);
 
 DisasterSimulation.Simulator simulator = new(faceData.ToArray());
-simulator.Start(5/*70*/);
+simulator.Start(170/*5*//*70*/);
 List<Result> result = simulator.result;
 
 Console.WriteLine("シミュレーション結果を書き込み中...");
-int lengthPerFile = 10;
+int lengthPerFile = 1;
 List<Task> writeTasks = new();
 List<String> fileNames = new();
 for (int i = 0; i < result.Count; i += lengthPerFile)

@@ -49,6 +49,16 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "Alea": {
+              "target": "Package",
+              "version": "[3.0.4, )"
+            },
+            "FSharp.Core": {
+              "target": "Package",
+              "version": "[9.0.101, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

@@ -45,7 +45,7 @@ namespace DisasterSimulation
         [JsonPropertyName("springConstant")]
         public required double SpringConstant { get; set; }  // ばね係数
     }
-
+    
     internal class FaceData
     {
         [JsonPropertyName("index")] public int Index { get; set; }
@@ -86,26 +86,27 @@ namespace DisasterSimulation
 
         readonly static double numberOfNearParticle = 12;
 
-        readonly static double particleDistance = 2;
+        readonly static double particleDistance = 2/*0.01*/;
         readonly static double volumePerParticle = Math.Pow(particleDistance, 3d);
         readonly static double particleDiameter = Math.Pow(volumePerParticle, 1d / 3d);
 
         readonly static Vector3 g = new(0, -9.8, 0);  // 重力加速度
-        readonly static double pressureStiffness = 200; //圧力係数
+        readonly static double pressureStiffness = 0.1/*200*/; //圧力係数
         readonly static double restDensity = 1000; //静止密度
         readonly static double viscosity = 0.000001;  // 粘性係数
-        readonly static double dampingCoefficient = 256/*0.03*/;  // ダンパ係数
-        readonly static double springConstant = 10000/*7*//*14*/;  // ばね係数
+        readonly static double dampingCoefficient = /*0.256*//*256*/0.03;  // ダンパ係数
+        readonly static double springConstant = /*10*//*10000*//*7*/15;  // ばね係数
 
         readonly static double h = Math.Pow((3 * numberOfNearParticle) / (4 * Math.PI), 1d / 3d) * particleDiameter/*100*//*0.3*//* 0.012 */; //影響半径
         readonly static double particleMass = restDensity * volumePerParticle/*9000*//*0.0002*/; //粒子の質量
 
-        readonly double densityCoef = particleMass * 315 / (64 * Math.PI * Math.Pow(h, 9)); //密度計算で使う
+        //readonly double densityCoef = particleMass * 315 / (64 * Math.PI * Math.Pow(h, 9)); //密度計算で使う
+        readonly double densityCoef = particleMass * 15 / (Math.PI * Math.Pow(h, 6)); //密度計算で使う
         readonly double pressureCoef = particleMass * 45 / (Math.PI * Math.Pow(h, 6)); //圧力項計算で使う
         readonly double viscosityCoef = viscosity * particleMass * 45 / (Math.PI * Math.Pow(h, 6)); //粘性項計算で使う
 
         readonly List<Particle> _particles = [];
-        readonly static double deltaTime = 0.03;
+        readonly static double deltaTime = 0.1/*0.03*/;
 
         Task CalcDensity(List<Particle> particles)
         {
@@ -153,7 +154,7 @@ namespace DisasterSimulation
                     if (pressure >= 0)
                     {
                         particles[index].pressure = pressure;
-                        Console.WriteLine(pressure);
+                        //Console.WriteLine(pressure);
                     }
                     else
                     {
@@ -196,6 +197,7 @@ namespace DisasterSimulation
                     }
 
                     terms[index].pressureTerm = Vector3Utility.MultiplyScalarVector3(sum, (-1/*/nowParticle.pressure*/) * pressureCoef);  // 圧力項が求まった
+                    //Console.WriteLine($"{terms[index].pressureTerm.X},{terms[index].pressureTerm.Y},{terms[index].pressureTerm.Z}");
                 });
                 tasks.Add(task);
             }
@@ -322,7 +324,7 @@ namespace DisasterSimulation
 
         static void AddParticles(List<Particle> particles)
         {
-            for (double z = 1000/*420*/; z <= 1007/*2303*/; z += particleDistance)
+            for (double z = /*1000*/420; z <= /*1007*/2303; z += particleDistance)
             {
                 for (double y = 45; y <= 50; y += particleDistance)
                 {
