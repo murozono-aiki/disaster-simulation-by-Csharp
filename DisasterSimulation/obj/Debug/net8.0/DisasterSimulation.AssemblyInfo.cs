@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DisasterSimulation")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+70a9308d551aca327eac494cfca9de8b168197c9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0cda83bef0c4710b528ac85113c3b3de9c2351af")]
 [assembly: System.Reflection.AssemblyProductAttribute("DisasterSimulation")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DisasterSimulation")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
