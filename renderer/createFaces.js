@@ -82,38 +82,43 @@ document.addEventListener("mousemove", onMousemove_camera);
 // 非同期処理で待機するのでasync function宣言とする
 async function init() {
     // GLTF形式のモデルデータを読み込む
-    const loader_building = new GLTFLoader();
+    const loader = new GLTFLoader();
     // GLTFファイルのパスを指定
-    //const gltf = await loader.loadAsync('data/Juso-data.glb');
-    const gltf_building = await loader_building.loadAsync('data/bldg_Building.glb');
+    const gltf = await loader.loadAsync('data/Judo_dem_bldg_tunamiWall.glb');
     // 読み込み後に3D空間に追加
-    const building = gltf_building.scene;
+    const building = gltf.scene;
     building.position.set(0, 0, 0);
     scene.add(building);
 
-    // GLTF形式のモデルデータを読み込む
-    const loader_reliefFeature = new GLTFLoader();
-    // GLTFファイルのパスを指定
-    //const gltf = await loader.loadAsync('data/Juso-data.glb');
-    const gltf_reliefFeature = await loader_reliefFeature.loadAsync('data/dem_ReliefFeature.glb');
-    // 読み込み後に3D空間に追加
-    const reliefFeature = gltf_reliefFeature.scene;
-    reliefFeature.position.set(0, 0, 0);
-    scene.add(reliefFeature);
-    renderer.render( scene, camera );
-
     const normalVectors_building = createNormalVectors(building.children[0].geometry);
-    const normalVectors_reliefFeature = createNormalVectors(reliefFeature.children[0].geometry);
 
-    const normalVectors = [].concat(normalVectors_building, normalVectors_reliefFeature);
-    const normalVectors_sortX = normalVectors.toSorted((a, b) => a.centerOfGravity.x - b.centerOfGravity.x);
-    const normalVectors_sortY = normalVectors.toSorted((a, b) => a.centerOfGravity.y - b.centerOfGravity.y);
-    const normalVectors_sortZ = normalVectors.toSorted((a, b) => a.centerOfGravity.z - b.centerOfGravity.z);
+    const normalVectors = [].concat(normalVectors_building);
 
     const particle = createParticleGeometry();
-    particle.position.x = -700;
+    particle.position.x = 0;
     particle.position.y = 45;
-    particle.position.z = 2303;
+    particle.position.z = 0;
+    /** @type {HTMLInputElement} */
+    const XElement = document.getElementById("x");
+    /** @type {HTMLInputElement} */
+    const YElement = document.getElementById("y");
+    /** @type {HTMLInputElement} */
+    const ZElement = document.getElementById("z");
+    XElement.value = 0; YElement.value = 45; ZElement.value = 0;
+    XElement.addEventListener("change", event => {
+        particle.position.x = parseFloat(XElement.value);
+        renderer.render( scene, camera );
+    });
+    YElement.addEventListener("change", event => {
+        particle.position.y = parseFloat(YElement.value);
+        renderer.render( scene, camera );
+    });
+    ZElement.addEventListener("change", event => {
+        particle.position.z = parseFloat(ZElement.value);
+        renderer.render( scene, camera );
+    });
+
+    renderer.render( scene, camera );
 
     const zipFileWriter = new BlobWriter('application/json');
     const textReaders = [];
