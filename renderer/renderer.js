@@ -121,6 +121,7 @@ function finishRecord() {
 
 /** @type {{time:number, particlePositions:({x:number, y:number, z:number}|null)[]}[]} */
 let resultData = [];
+let currentIndex = 0;
 
 async function loadResult() {
     const fileNameResponce = await fetch("./../source/output/fileNames.json");
@@ -174,16 +175,16 @@ function renderStep(timestamp) {
     const elapsed = (timestamp - start) / 1000;  // 秒単位
 
     let currentResultData;
-    while (resultData.length >= 1 && (!resultData[0] || resultData[0].time <= elapsed)) {
-        if (!resultData[0]) resultData.shift();
-        else currentResultData = resultData.shift();
+    while (currentIndex < resultData.length && (!resultData[currentIndex] || resultData[currentIndex].time <= elapsed)) {
+        currentIndex++;
+        if (resultData[currentIndex]) currentResultData = resultData[currentIndex];
     }
     if (currentResultData) {
         document.getElementById("time").textContent = Math.round(currentResultData.time) + "秒";
         renderParticles(currentResultData.particlePositions);
     }
 
-    if (resultData.length >= 1) {
+    if (currentIndex < resultData.length) {
         window.requestAnimationFrame(renderStep);
     } else {
         finishRecord();
@@ -191,5 +192,11 @@ function renderStep(timestamp) {
 }
 
 Promise.all([initPromise, loadPromise]).then(() => {
-    window.requestAnimationFrame(renderStep);
+    /** @type {HTMLButtonElement} */
+    const startButton = document.getElementById("start");
+    startButton.disabled = false;
+    startButton.addEventListener("click", event => {
+        currentIndex = 0;
+        window.requestAnimationFrame(renderStep);
+    });
 });
