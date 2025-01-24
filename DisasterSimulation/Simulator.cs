@@ -653,20 +653,13 @@ namespace DisasterSimulation
                 }
             }
             //粒子ごとに影響を与える粒子の配列を求める
-            Console.WriteLine("CalcAffectingParticles");
             CalcAffectingParticles(h,_particles, _particleXwithId, _particleYwithId, _particleZwithId).Wait();
-            Console.WriteLine("CalcDensity");
             CalcDensity(_particles).Wait();
-            Console.WriteLine("CalcPressure");
             CalcPressure(_particles).Wait();
-            Console.WriteLine("CalcPressureTerm");
             CalcPressureTerm(_particles).Wait();
-            Console.WriteLine("CalcViscosityTerm");
             CalcViscosityTerm(_particles).Wait();
-            Console.WriteLine("CalcColiderTerm");
             CalcColiderTerm(_particles).Wait();
 
-            Console.WriteLine("result");
             List<Vector3?> tickResult = [];
             for (int i = 0; i < _particles.Count; i++)
             {
