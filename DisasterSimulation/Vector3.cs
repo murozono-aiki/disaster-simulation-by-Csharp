@@ -39,5 +39,10 @@ namespace DisasterSimulation
         {
             return new Vector3(a.Y * b.Z - a.Z * b.Y, a.Z * b.X - a.X * b.Z, a.X * b.Y - a.Y * b.X);
         }
+
+        public static Vector3 NormalizeVector3(Vector3 vector)
+        {
+            return MultiplyScalarVector3(vector, 1d / Math.Sqrt(DotVector3(vector, vector)));
+        }
     }
 }

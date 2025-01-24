@@ -97,6 +97,7 @@ namespace DisasterSimulation
 
         readonly Dictionary<int, Term> terms = [];
 
+        readonly static double tsunamiSpeed = 10;
         readonly static double numberOfNearParticle = 12;
 
         readonly static double particleDistance = 2/*0.01*/;
@@ -637,13 +638,20 @@ namespace DisasterSimulation
                 }
             }
             //粒子ごとに影響を与える粒子の配列を求める
+            Console.WriteLine("CalcAffectingParticles");
             CalcAffectingParticles(h,_particles, _particleXwithId, _particleYwithId, _particleZwithId).Wait();
+            Console.WriteLine("CalcDensity");
             CalcDensity(_particles).Wait();
+            Console.WriteLine("CalcPressure");
             CalcPressure(_particles).Wait();
+            Console.WriteLine("CalcPressureTerm");
             CalcPressureTerm(_particles).Wait();
+            Console.WriteLine("CalcViscosityTerm");
             CalcViscosityTerm(_particles).Wait();
+            Console.WriteLine("CalcColiderTerm");
             CalcColiderTerm(_particles).Wait();
 
+            Console.WriteLine("result");
             List<Vector3?> tickResult = [];
             for (int i = 0; i < _particles.Count; i++)
             {
@@ -716,6 +724,7 @@ namespace DisasterSimulation
 
         static void AddParticles(List<Particle> particles, uint lastUsedId)
         {
+            Vector3 tsunamiVelocity = Vector3Utility.MultiplyScalarVector3(Vector3Utility.NormalizeVector3(new Vector3(0.72342719346605268235776097708833, 0, 1)), tsunamiSpeed);
             for (double z = -1288; z <= 1155; z += particleDistance)
             {
                 for (double y = 38; y <= 43; y += particleDistance)
@@ -723,7 +732,7 @@ namespace DisasterSimulation
                     Particle particle = new()
                     {
                         position = new Vector3(0.72342719346605268235776097708833 * z - 582.38286403266973658821119511456, y, z),
-                        velocity = new Vector3(10, 0, 0),
+                        velocity = tsunamiVelocity,
                         id = lastUsedId
                     };
                     lastUsedId = lastUsedId++;
