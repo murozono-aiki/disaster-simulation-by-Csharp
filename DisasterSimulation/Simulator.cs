@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using DisasterSimulation;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using static DisasterSimulation.Simulator;
@@ -448,11 +449,12 @@ namespace DisasterSimulation
                         List<double> distancesBetweenSelectedParticle = new();
                         List<int> selectedParticleIndex = new();
                         List<Vector3> vectorsBetweenAffectingParticle = new();
+                        double h2 = h * h;
                         for (int j = 0; j < selectedIdList.Count; j++)
                         {
                             Vector3 diff = Vector3Utility.SubVector3(particles.Find(n => n.id == selectedIdList[j]).position, particles[i].position); //粒子距離
                             double r2 = Vector3Utility.DotVector3(diff, diff); //粒子距離の２乗
-                            if (r2 >= h * h)
+                            if (r2 >= h2)
                             {
                                 selectedIdList.Remove(selectedIdList[j]);
 
@@ -703,7 +705,10 @@ namespace DisasterSimulation
                     };
                     _particleZwithId.Insert(_particleZwithId.FindIndex(n => n.pos >= nowParticle.position.Z), particlePosWithId_Z);
                 }
-                tickResult.Add(nowParticle.position);
+                if (-1000000 < nowParticle.position.X && nowParticle.position.X < 1000000 && -1000000 < nowParticle.position.Y && nowParticle.position.Y < 1000000 && -1000000 < nowParticle.position.Z && nowParticle.position.Z < 1000000)  // 暫定的な措置
+                {
+                    tickResult.Add(nowParticle.position);
+                }
             }
             _particles.RemoveAll(particle => particle.position.Y <= 0);
             return [.. tickResult];
@@ -711,13 +716,13 @@ namespace DisasterSimulation
 
         static void AddParticles(List<Particle> particles, uint lastUsedId)
         {
-            for (double z = /*1000*/420; z <= /*1007*/2303; z += particleDistance)
+            for (double z = -1288; z <= 1155; z += particleDistance)
             {
-                for (double y = 45; y <= 50; y += particleDistance)
+                for (double y = 38; y <= 43; y += particleDistance)
                 {
                     Particle particle = new()
                     {
-                        position = new Vector3(-700, y, z),
+                        position = new Vector3(0.72342719346605268235776097708833 * z - 582.38286403266973658821119511456, y, z),
                         velocity = new Vector3(10, 0, 0),
                         id = lastUsedId
                     };

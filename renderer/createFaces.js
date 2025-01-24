@@ -90,9 +90,11 @@ async function init() {
     building.position.set(0, 0, 0);
     scene.add(building);
 
-    const normalVectors_building = createNormalVectors(building.children[0].geometry);
+    console.info(building);
+    const normalVectors1 = createNormalVectors(building.children[0].children[0].geometry);
+    const normalVectors2 = createNormalVectors(building.children[0].children[1].geometry);
 
-    const normalVectors = [].concat(normalVectors_building);
+    const normalVectors = [].concat(normalVectors1, normalVectors2);
 
     const particle = createParticleGeometry();
     particle.position.x = 0;
@@ -115,6 +117,7 @@ async function init() {
     });
     ZElement.addEventListener("change", event => {
         particle.position.z = parseFloat(ZElement.value);
+        particle.position.x = 0.72342719346605268235776097708833 * parseFloat(ZElement.value) -582.38286403266973658821119511456
         renderer.render( scene, camera );
     });
 
