@@ -62,6 +62,15 @@ namespace DisasterSimulation
             [JsonPropertyName("normalVector")] public required Vector3 NormalVector { get; set; }
         }
     }
+    internal class FaceDataInfo
+    {
+        public double maxX = double.PositiveInfinity;
+        public double minX = double.NegativeInfinity;
+        public double maxY = double.PositiveInfinity;
+        public double minY = double.NegativeInfinity;
+        public double maxZ = double.PositiveInfinity;
+        public double minZ = double.NegativeInfinity;
+    }
 
     internal class Simulator(FaceData[] data)
     {
@@ -94,6 +103,7 @@ namespace DisasterSimulation
         internal List<Result> result = [];
 
         readonly FaceData[] data = data;
+        FaceDataInfo[] dataInfo = new FaceDataInfo[data.Length];
 
         readonly Dictionary<int, Term> terms = [];
 
@@ -614,6 +624,11 @@ namespace DisasterSimulation
                     {
                         //if (!filterArray[j]) continue;
                         FaceData nowPoint = data[j];
+                        FaceDataInfo nowPointInfo = dataInfo[j];
+                        if (dataInfo[j].minX > nowParticle.position.X || dataInfo[j].maxX < nowParticle.position.X || dataInfo[j].minY > nowParticle.position.Y || dataInfo[j].maxY < nowParticle.position.Y || dataInfo[j].minZ > nowParticle.position.Z || dataInfo[j].maxZ < nowParticle.position.Z)
+                        {
+                            continue;
+                        }
                         if (Is_inside(nowParticle.position, nowPoint))
                         {
                             double distance = Math.Abs(Vector3Utility.DotVector3(Vector3Utility.SubVector3(nowParticle.position, nowPoint.CenterOfGravity), nowPoint.NormalVector));
@@ -792,10 +807,69 @@ namespace DisasterSimulation
         }
         public void Start(double simulateSeconds)
         {
-            // 初めに実行する処理
-            //makeWall(_particles);
-
             Console.WriteLine("シミュレーション開始");
+
+            double height = 5;  // 最大食い込み量（食い込んでいる面を特定するために用いる）←createFaces.jsと同じ値を用いること
+            for (int i = 0; i < data.Length; i++)
+            {
+                dataInfo[i] = new();
+                FaceData point = data[i];
+                Vector3 heightVector = Vector3Utility.MultiplyScalarVector3(point.NormalVector, -height);
+                for (int j = 0; j < point.Triangle.Length; j++)
+                {
+                    Vector3 point1 = point.Triangle[j];
+                    Vector3 point2 = Vector3Utility.AddVector3(point.Triangle[j], heightVector);
+                    if (point1.X < dataInfo[i].minX)
+                    {
+                        dataInfo[i].minX = point1.X;
+                    }
+                    if (point1.X > dataInfo[i].maxX)
+                    {
+                        dataInfo[i].maxX = point1.X;
+                    }
+                    if (point1.Y < dataInfo[i].minY)
+                    {
+                        dataInfo[i].minY = point1.Y;
+                    }
+                    if (point1.Y > dataInfo[i].maxY)
+                    {
+                        dataInfo[i].maxY = point1.Y;
+                    }
+                    if (point1.Z < dataInfo[i].minZ)
+                    {
+                        dataInfo[i].minZ = point1.Z;
+                    }
+                    if (point1.Z > dataInfo[i].maxZ)
+                    {
+                        dataInfo[i].maxZ = point1.Z;
+                    }
+                    if (point2.X < dataInfo[i].minX)
+                    {
+                        dataInfo[i].minX = point2.X;
+                    }
+                    if (point2.X > dataInfo[i].maxX)
+                    {
+                        dataInfo[i].maxX = point2.X;
+                    }
+                    if (point2.Y < dataInfo[i].minY)
+                    {
+                        dataInfo[i].minY = point2.Y;
+                    }
+                    if (point2.Y > dataInfo[i].maxY)
+                    {
+                        dataInfo[i].maxY = point2.Y;
+                    }
+                    if (point2.Z < dataInfo[i].minZ)
+                    {
+                        dataInfo[i].minZ = point2.Z;
+                    }
+                    if (point2.Z > dataInfo[i].maxZ)
+                    {
+                        dataInfo[i].maxZ = point2.Z;
+                    }
+                }
+            }
+
             for (int i = 0; i < simulateSeconds / deltaTime; i++)
             {
                 if (i % 3  == 0)
