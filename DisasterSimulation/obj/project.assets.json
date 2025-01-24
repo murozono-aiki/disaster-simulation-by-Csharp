@@ -1,145 +1,11 @@
 {
   "version": 3,
   "targets": {
-    "net8.0": {
-      "Alea/3.0.4": {
-        "type": "package",
-        "build": {
-          "build/Alea.targets": {}
-        }
-      },
-      "FSharp.Core/9.0.101": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.1/FSharp.Core.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard2.1/FSharp.Core.dll": {
-            "related": ".xml"
-          }
-        },
-        "resource": {
-          "lib/netstandard2.1/cs/FSharp.Core.resources.dll": {
-            "locale": "cs"
-          },
-          "lib/netstandard2.1/de/FSharp.Core.resources.dll": {
-            "locale": "de"
-          },
-          "lib/netstandard2.1/es/FSharp.Core.resources.dll": {
-            "locale": "es"
-          },
-          "lib/netstandard2.1/fr/FSharp.Core.resources.dll": {
-            "locale": "fr"
-          },
-          "lib/netstandard2.1/it/FSharp.Core.resources.dll": {
-            "locale": "it"
-          },
-          "lib/netstandard2.1/ja/FSharp.Core.resources.dll": {
-            "locale": "ja"
-          },
-          "lib/netstandard2.1/ko/FSharp.Core.resources.dll": {
-            "locale": "ko"
-          },
-          "lib/netstandard2.1/pl/FSharp.Core.resources.dll": {
-            "locale": "pl"
-          },
-          "lib/netstandard2.1/pt-BR/FSharp.Core.resources.dll": {
-            "locale": "pt-BR"
-          },
-          "lib/netstandard2.1/ru/FSharp.Core.resources.dll": {
-            "locale": "ru"
-          },
-          "lib/netstandard2.1/tr/FSharp.Core.resources.dll": {
-            "locale": "tr"
-          },
-          "lib/netstandard2.1/zh-Hans/FSharp.Core.resources.dll": {
-            "locale": "zh-Hans"
-          },
-          "lib/netstandard2.1/zh-Hant/FSharp.Core.resources.dll": {
-            "locale": "zh-Hant"
-          }
-        }
-      }
-    }
+    "net8.0": {}
   },
-  "libraries": {
-    "Alea/3.0.4": {
-      "sha512": "zpLvEj8JchGqS/cDuGVMJTwBPrco6fXY8J+Xp3aHM/Kb0+CBpLAqwLAbT4tcLXXOo1VDBwO8tO0waPRfwLvvig==",
-      "type": "package",
-      "path": "alea/3.0.4",
-      "hasTools": true,
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Alea.fsx",
-        "alea.3.0.4.nupkg.sha512",
-        "alea.nuspec",
-        "build/Alea.targets",
-        "lib/net45/Alea.IL.dll",
-        "lib/net45/Alea.Parallel.dll",
-        "lib/net45/Alea.XML",
-        "lib/net45/Alea.dll",
-        "tools/Alea.Build.dll",
-        "tools/Alea.CUDA.CT.LibDevice.dll",
-        "tools/Alea.CUDA.CT.Native.X86.B32.Windows.dll",
-        "tools/Alea.CUDA.CT.Native.X86.B64.Linux.dll",
-        "tools/Alea.CUDA.CT.Native.X86.B64.MacOSX.dll",
-        "tools/Alea.CUDA.CT.Native.X86.B64.Windows.dll",
-        "tools/Alea.dll",
-        "tools/FSharp.Core.dll",
-        "tools/LicenseManager.exe"
-      ]
-    },
-    "FSharp.Core/9.0.101": {
-      "sha512": "3/YR1SDWFA+Ojx9HiBwND+0UR8ZWoeZfkhD0DWAPCDdr/YI+CyFkArmMGzGSyPXeYtjG0sy0emzfyNwjt7zhig==",
-      "type": "package",
-      "path": "fsharp.core/9.0.101",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "fsharp.core.9.0.101.nupkg.sha512",
-        "fsharp.core.nuspec",
-        "lib/netstandard2.0/FSharp.Core.dll",
-        "lib/netstandard2.0/FSharp.Core.xml",
-        "lib/netstandard2.0/cs/FSharp.Core.resources.dll",
-        "lib/netstandard2.0/de/FSharp.Core.resources.dll",
-        "lib/netstandard2.0/es/FSharp.Core.resources.dll",
-        "lib/netstandard2.0/fr/FSharp.Core.resources.dll",
-        "lib/netstandard2.0/it/FSharp.Core.resources.dll",
-        "lib/netstandard2.0/ja/FSharp.Core.resources.dll",
-        "lib/netstandard2.0/ko/FSharp.Core.resources.dll",
-        "lib/netstandard2.0/pl/FSharp.Core.resources.dll",
-        "lib/netstandard2.0/pt-BR/FSharp.Core.resources.dll",
-        "lib/netstandard2.0/ru/FSharp.Core.resources.dll",
-        "lib/netstandard2.0/tr/FSharp.Core.resources.dll",
-        "lib/netstandard2.0/zh-Hans/FSharp.Core.resources.dll",
-        "lib/netstandard2.0/zh-Hant/FSharp.Core.resources.dll",
-        "lib/netstandard2.1/FSharp.Core.dll",
-        "lib/netstandard2.1/FSharp.Core.xml",
-        "lib/netstandard2.1/cs/FSharp.Core.resources.dll",
-        "lib/netstandard2.1/de/FSharp.Core.resources.dll",
-        "lib/netstandard2.1/es/FSharp.Core.resources.dll",
-        "lib/netstandard2.1/fr/FSharp.Core.resources.dll",
-        "lib/netstandard2.1/it/FSharp.Core.resources.dll",
-        "lib/netstandard2.1/ja/FSharp.Core.resources.dll",
-        "lib/netstandard2.1/ko/FSharp.Core.resources.dll",
-        "lib/netstandard2.1/pl/FSharp.Core.resources.dll",
-        "lib/netstandard2.1/pt-BR/FSharp.Core.resources.dll",
-        "lib/netstandard2.1/ru/FSharp.Core.resources.dll",
-        "lib/netstandard2.1/tr/FSharp.Core.resources.dll",
-        "lib/netstandard2.1/zh-Hans/FSharp.Core.resources.dll",
-        "lib/netstandard2.1/zh-Hant/FSharp.Core.resources.dll"
-      ]
-    }
-  },
+  "libraries": {},
   "projectFileDependencyGroups": {
-    "net8.0": [
-      "Alea >= 3.0.4",
-      "FSharp.Core >= 9.0.101"
-    ]
+    "net8.0": []
   },
   "packageFolders": {
     "C:\\Users\\muroz\\.nuget\\packages\\": {},
@@ -190,16 +56,6 @@
     "frameworks": {
       "net8.0": {
         "targetAlias": "net8.0",
-        "dependencies": {
-          "Alea": {
-            "target": "Package",
-            "version": "[3.0.4, )"
-          },
-          "FSharp.Core": {
-            "target": "Package",
-            "version": "[9.0.101, )"
-          }
-        },
         "imports": [
           "net461",
           "net462",
