@@ -64,12 +64,12 @@ namespace DisasterSimulation
     }
     internal class FaceDataInfo
     {
-        public double maxX = double.PositiveInfinity;
-        public double minX = double.NegativeInfinity;
-        public double maxY = double.PositiveInfinity;
-        public double minY = double.NegativeInfinity;
-        public double maxZ = double.PositiveInfinity;
-        public double minZ = double.NegativeInfinity;
+        public double maxX = double.NegativeInfinity;
+        public double minX = double.PositiveInfinity;
+        public double maxY = double.NegativeInfinity;
+        public double minY = double.PositiveInfinity;
+        public double maxZ = double.NegativeInfinity;
+        public double minZ = double.PositiveInfinity;
     }
 
     internal class Simulator(FaceData[] data)
