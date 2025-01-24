@@ -12,7 +12,4 @@
   <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <SourceRoot Include="C:\Users\happy\.nuget\packages\" />
   </ItemGroup>
-  <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <PkgAlea Condition=" '$(PkgAlea)' == '' ">C:\Users\muroz\.nuget\packages\alea\3.0.4</PkgAlea>
-  </PropertyGroup>
 </Project>
