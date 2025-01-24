@@ -124,12 +124,11 @@ namespace DisasterSimulation
             for (int index = 0; index < particles.Count; index++)
             {
                 int i = index;
-                
                 Task task = Task.Run(() =>
                 {
                     uint selfId;
                     double mainNumInSearching;
-                    int selectedIndex = 0;
+                    int selectedIndex;
                     int UpperLimitIndex;
                     int LowerLimitIndex;
                     List<ParticlePositionInSingleDirectionWithId> selectedYParticleDatas = new();
@@ -152,26 +151,11 @@ namespace DisasterSimulation
                      */
 
                     //影響境界が粒子群の内部にあることを確認する
-                    if (particles[i].position.X - h > particleXwithId[particleXwithId.Count-1].pos)
+                    if (particles[i].position.X - h > particleXwithId[particleXwithId.Count].pos)
                     {
 
                     }
                     else if (particles[i].position.X + h < particleXwithId[0].pos)
-                    {
-
-                    }
-                    else if (particles[i].position.Y - h > particleYwithId[particleYwithId.Count -1].pos)
-                    {
-
-                    }
-                    else if (particles[i].position.Y + h < particleYwithId[0].pos)
-                    {
-
-                    }else if (particles[i].position.Z - h > particleZwithId[particleZwithId.Count -1].pos)
-                    {
-
-                    }
-                    else if (particles[i].position.Z + h < particleZwithId[0].pos)
                     {
 
                     }
@@ -182,13 +166,12 @@ namespace DisasterSimulation
 
                         //X軸での下限を求める
                         mainNumInSearching = particles[i].position.X - h;
-                        UpperLimitIndex = particleXwithId.Count - 1;
+                        UpperLimitIndex = particles.Count - 1;
                         LowerLimitIndex = 0;
                         int smallestParticleInAffect_Index;
                         while (true)
                         {
-
-                            if (UpperLimitIndex - LowerLimitIndex <= 1)
+                            if (UpperLimitIndex - LowerLimitIndex == 1)
                             {
                                 //探索終了
                                 if (particleXwithId[LowerLimitIndex].pos >= mainNumInSearching)
@@ -201,16 +184,12 @@ namespace DisasterSimulation
                                 }
                                 break;
                             }
-                            selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
+                            selectedIndex = (UpperLimitIndex - LowerLimitIndex) / 2;
                             //UpperとLowerはそれぞれ設定する際に、下手にインデックスずらさない
                             //これに従うと必ず最後は２つまで(UpperとLowerが隣接するところまで)行けるので、そこで二分探索を終了して、どちらを含めるかとかをやる
-                            if (particleXwithId[selectedIndex].pos == mainNumInSearching) {
-                                smallestParticleInAffect_Index = selectedIndex;
-                                break;
-                            }else if (particleXwithId[selectedIndex].pos < mainNumInSearching)
+                            if (particleXwithId[selectedIndex].pos <= mainNumInSearching)
                             {
                                 LowerLimitIndex = selectedIndex;
-
                             }
                             else
                             {
@@ -219,12 +198,12 @@ namespace DisasterSimulation
                         }
                         //X軸での上限を求める
                         mainNumInSearching = particles[i].position.X + h;
-                        UpperLimitIndex = particleXwithId.Count - 1;
+                        UpperLimitIndex = particles.Count - 1;
                         LowerLimitIndex = 0;
                         int largestParticleInAffect_Index;
                         while (true)
                         {
-                            if (UpperLimitIndex - LowerLimitIndex <= 1)
+                            if (UpperLimitIndex - LowerLimitIndex == 1)
                             {
                                 //探索終了
                                 if (particleXwithId[UpperLimitIndex].pos <= mainNumInSearching)
@@ -235,15 +214,12 @@ namespace DisasterSimulation
                                 {
                                     largestParticleInAffect_Index = LowerLimitIndex;
                                 }
-                            break;
+                                break;
                             }
-                            selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
+                            selectedIndex = (UpperLimitIndex - LowerLimitIndex) / 2;
                             //UpperとLowerはそれぞれ設定する際に、下手にインデックスずらさない
                             //これに従うと必ず最後は２つまで(UpperとLowerが隣接するところまで)行けるので、そこで二分探索を終了して、どちらを含めるかとかをやる
-                            if (particleXwithId[selectedIndex].pos == mainNumInSearching) {
-                                largestParticleInAffect_Index = selectedIndex;
-                                break;
-                            }else if (particleXwithId[selectedIndex].pos > mainNumInSearching)
+                            if (particleXwithId[selectedIndex].pos >= mainNumInSearching)
                             {
                                 UpperLimitIndex = selectedIndex;
                             }
@@ -260,7 +236,6 @@ namespace DisasterSimulation
                         {
                             selectedIdList.Remove(selfId);
                         }
-                        /*
                         List<int> selectedYIndex = new List<int>();
                         for (int j = 0; j < selectedIdList.Count; j++)
                         {
@@ -274,22 +249,40 @@ namespace DisasterSimulation
                             }
                         }
                         selectedYIndex.Sort();
-                        */
-                       
-                       
+                        for (int j = 0; j < selectedYIndex.Count; j++)
+                        {
+                            ParticlePositionInSingleDirectionWithId selectedYParticleData = new ParticlePositionInSingleDirectionWithId()
+                            {
+                                pos = particleYwithId[selectedYIndex[j]].pos,
+                                id = particleYwithId[selectedYIndex[j]].id
+                            };
+                            selectedYParticleDatas.Add(selectedYParticleData);
+                        }
+
+                        //再び範囲外の場合を考える
+                        if (particles[i].position.Y - h > selectedYParticleDatas[selectedYParticleDatas.Count].pos)
+                        {
+
+                        }
+                        else if (particles[i].position.Y + h < selectedYParticleDatas[0].pos)
+                        {
+
+                        }
+                        else
+                        {
 
 
 
                             //Y軸での下限を求める
                             mainNumInSearching = particles[i].position.Y - h;
-                            UpperLimitIndex = particleYwithId.Count - 1;
+                            UpperLimitIndex = particles.Count - 1;
                             LowerLimitIndex = 0;
                             while (true)
                             {
-                                if (UpperLimitIndex - LowerLimitIndex <= 1)
+                                if (UpperLimitIndex - LowerLimitIndex == 1)
                                 {
                                     //探索終了
-                                    if (particleYwithId[LowerLimitIndex].pos >= mainNumInSearching)
+                                    if (selectedYParticleDatas[LowerLimitIndex].pos >= mainNumInSearching)
                                     {
                                         smallestParticleInAffect_Index = LowerLimitIndex;
                                     }
@@ -297,33 +290,30 @@ namespace DisasterSimulation
                                     {
                                         smallestParticleInAffect_Index = UpperLimitIndex;
                                     }
-                            break;
+                                    break;
                                 }
-                                selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
-                            //UpperとLowerはそれぞれ設定する際に、下手にインデックスずらさない
-                            //これに従うと必ず最後は２つまで(UpperとLowerが隣接するところまで)行けるので、そこで二分探索を終了して、どちらを含めるかとかをやる
-                            if (particleYwithId[selectedIndex].pos == mainNumInSearching) {
-                                smallestParticleInAffect_Index = selectedIndex;
-                                break;
-                            } else if (particleYwithId[selectedIndex].pos < mainNumInSearching)
-                            {
-                                LowerLimitIndex = selectedIndex;
-                            }
-                            else
-                            {
-                                UpperLimitIndex = selectedIndex;
-                            }
+                                selectedIndex = (UpperLimitIndex - LowerLimitIndex) / 2;
+                                //UpperとLowerはそれぞれ設定する際に、下手にインデックスずらさない
+                                //これに従うと必ず最後は２つまで(UpperとLowerが隣接するところまで)行けるので、そこで二分探索を終了して、どちらを含めるかとかをやる
+                                if (selectedYParticleDatas[selectedIndex].pos <= mainNumInSearching)
+                                {
+                                    LowerLimitIndex = selectedIndex;
+                                }
+                                else
+                                {
+                                    UpperLimitIndex = selectedIndex;
+                                }
                             }
                             //Y軸での上限を求める
                             mainNumInSearching = particles[i].position.Y + h;
-                            UpperLimitIndex = particleYwithId.Count - 1;
+                            UpperLimitIndex = particles.Count - 1;
                             LowerLimitIndex = 0;
                             while (true)
                             {
-                                if (UpperLimitIndex - LowerLimitIndex <= 1)
+                                if (UpperLimitIndex - LowerLimitIndex == 1)
                                 {
                                     //探索終了
-                                    if (particleYwithId[UpperLimitIndex].pos <= mainNumInSearching)
+                                    if (selectedYParticleDatas[UpperLimitIndex].pos <= mainNumInSearching)
                                     {
                                         largestParticleInAffect_Index = UpperLimitIndex;
                                     }
@@ -331,15 +321,12 @@ namespace DisasterSimulation
                                     {
                                         largestParticleInAffect_Index = LowerLimitIndex;
                                     }
-                            break;
+                                    break;
                                 }
-                                selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
-                            //UpperとLowerはそれぞれ設定する際に、下手にインデックスずらさない
-                            //これに従うと必ず最後は２つまで(UpperとLowerが隣接するところまで)行けるので、そこで二分探索を終了して、どちらを含めるかとかをやる
-                            if (particleYwithId[selectedIndex].pos == mainNumInSearching) {
-                                largestParticleInAffect_Index = selectedIndex;
-                                break;
-                            }else if (particleYwithId[selectedIndex].pos > mainNumInSearching)
+                                selectedIndex = (UpperLimitIndex - LowerLimitIndex) / 2;
+                                //UpperとLowerはそれぞれ設定する際に、下手にインデックスずらさない
+                                //これに従うと必ず最後は２つまで(UpperとLowerが隣接するところまで)行けるので、そこで二分探索を終了して、どちらを含めるかとかをやる
+                                if (selectedYParticleDatas[selectedIndex].pos >= mainNumInSearching)
                                 {
                                     UpperLimitIndex = selectedIndex;
                                 }
@@ -350,21 +337,59 @@ namespace DisasterSimulation
                             }
                             for (int j = LowerLimitIndex; j <= UpperLimitIndex; j++)
                             {
-                                if (selectedIdList.Contains(particleYwithId[j].id) == false)
+                                if (selectedIdList.Contains(selectedYParticleDatas[j].id) == false)
                                 {
-                                    selectedIdList.Remove(particleYwithId[j].id);
+                                    selectedIdList.Remove(selectedYParticleDatas[j].id);
                                 }
                             }
-                                //Z軸での下限を求める
+
+                            List<int> selectedZIndex = new List<int>();
+                            for (int j = 0; j < selectedIdList.Count; j++)
+                            {
+                                for (int k = 0; k < particleZwithId.Count; k++)
+                                {
+                                    if (selectedIdList[j] == particleZwithId[k].id)
+                                    {
+                                        selectedZIndex.Add(k);
+                                        break;
+                                    }
+                                }
+                            }
+                            selectedZIndex.Sort();
+                            for (int j = 0; j < selectedZIndex.Count; j++)
+                            {
+                                ParticlePositionInSingleDirectionWithId selectedZParticleData = new ParticlePositionInSingleDirectionWithId()
+                                {
+                                    pos = particleZwithId[selectedZIndex[j]].pos,
+                                    id = particleZwithId[selectedZIndex[j]].id
+                                };
+                                selectedZParticleDatas.Add(selectedZParticleData);
+                            }
+
+                            //再び範囲外の場合を考える
+                            if (particles[i].position.Z - h > selectedZParticleDatas[selectedZParticleDatas.Count].pos)
+                            {
+
+                            }
+                            else if (particles[i].position.Z + h < selectedZParticleDatas[0].pos)
+                            {
+
+                            }
+                            else
+                            {
+
+
+
+                                //Y軸での下限を求める
                                 mainNumInSearching = particles[i].position.Z - h;
                                 UpperLimitIndex = particles.Count - 1;
                                 LowerLimitIndex = 0;
                                 while (true)
                                 {
-                                    if (UpperLimitIndex - LowerLimitIndex <= 1)
+                                    if (UpperLimitIndex - LowerLimitIndex == 1)
                                     {
                                         //探索終了
-                                        if (particleZwithId[LowerLimitIndex].pos >= mainNumInSearching)
+                                        if (selectedZParticleDatas[LowerLimitIndex].pos >= mainNumInSearching)
                                         {
                                             smallestParticleInAffect_Index = LowerLimitIndex;
                                         }
@@ -372,15 +397,12 @@ namespace DisasterSimulation
                                         {
                                             smallestParticleInAffect_Index = UpperLimitIndex;
                                         }
-                            break;
+                                        break;
                                     }
-                                    selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
-                            //UpperとLowerはそれぞれ設定する際に、下手にインデックスずらさない
-                            //これに従うと必ず最後は２つまで(UpperとLowerが隣接するところまで)行けるので、そこで二分探索を終了して、どちらを含めるかとかをやる
-                            if (particleZwithId[selectedIndex].pos == mainNumInSearching) {
-                                smallestParticleInAffect_Index = selectedIndex;
-                                break;
-                            }else if (particleZwithId[selectedIndex].pos < mainNumInSearching)
+                                    selectedIndex = (UpperLimitIndex - LowerLimitIndex) / 2;
+                                    //UpperとLowerはそれぞれ設定する際に、下手にインデックスずらさない
+                                    //これに従うと必ず最後は２つまで(UpperとLowerが隣接するところまで)行けるので、そこで二分探索を終了して、どちらを含めるかとかをやる
+                                    if (selectedZParticleDatas[selectedIndex].pos <= mainNumInSearching)
                                     {
                                         LowerLimitIndex = selectedIndex;
                                     }
@@ -389,16 +411,16 @@ namespace DisasterSimulation
                                         UpperLimitIndex = selectedIndex;
                                     }
                                 }
-                                //Z軸での上限を求める
+                                //Y軸での上限を求める
                                 mainNumInSearching = particles[i].position.Z + h;
-                                UpperLimitIndex = particleZwithId.Count - 1;
+                                UpperLimitIndex = particles.Count - 1;
                                 LowerLimitIndex = 0;
                                 while (true)
                                 {
-                                    if (UpperLimitIndex - LowerLimitIndex <= 1)
+                                    if (UpperLimitIndex - LowerLimitIndex == 1)
                                     {
                                         //探索終了
-                                        if (particleZwithId[UpperLimitIndex].pos <= mainNumInSearching)
+                                        if (selectedZParticleDatas[UpperLimitIndex].pos <= mainNumInSearching)
                                         {
                                             largestParticleInAffect_Index = UpperLimitIndex;
                                         }
@@ -406,15 +428,12 @@ namespace DisasterSimulation
                                         {
                                             largestParticleInAffect_Index = LowerLimitIndex;
                                         }
-                            break;
+                                        break;
                                     }
-                                    selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
-                            //UpperとLowerはそれぞれ設定する際に、下手にインデックスずらさない
-                            //これに従うと必ず最後は２つまで(UpperとLowerが隣接するところまで)行けるので、そこで二分探索を終了して、どちらを含めるかとかをやる
-                            if (particleZwithId[selectedIndex].pos == mainNumInSearching) {
-                                largestParticleInAffect_Index = selectedIndex;
-                                break;
-                            }else if (particleZwithId[selectedIndex].pos > mainNumInSearching)
+                                    selectedIndex = (UpperLimitIndex - LowerLimitIndex) / 2;
+                                    //UpperとLowerはそれぞれ設定する際に、下手にインデックスずらさない
+                                    //これに従うと必ず最後は２つまで(UpperとLowerが隣接するところまで)行けるので、そこで二分探索を終了して、どちらを含めるかとかをやる
+                                    if (selectedZParticleDatas[selectedIndex].pos >= mainNumInSearching)
                                     {
                                         UpperLimitIndex = selectedIndex;
                                     }
@@ -425,12 +444,12 @@ namespace DisasterSimulation
                                 }
                                 for (int j = LowerLimitIndex; j <= UpperLimitIndex; j++)
                                 {
-                                    if (selectedIdList.Contains(particleZwithId[j].id) == false)
+                                    if (selectedIdList.Contains(selectedZParticleDatas[j].id) == false)
                                     {
-                                        selectedIdList.Remove(particleZwithId[j].id);
+                                        selectedIdList.Remove(selectedZParticleDatas[j].id);
                                     }
                                 }
-                    List<double> distancesBetweenSelectedParticle = new();
+                                List<double> distancesBetweenSelectedParticle = new();
                                 List<int> selectedParticleIndex = new();
                                 List<Vector3> vectorsBetweenAffectingParticle = new();
                                 for (int j = 0; j < selectedIdList.Count; j++)
@@ -453,8 +472,9 @@ namespace DisasterSimulation
                                 particles[i].affectingParticleIndex = selectedParticleIndex;
                                 particles[i].DistancesBetweenAffectingParticle = distancesBetweenSelectedParticle;
                                 particles[i].vectorsBetweenAffectingParticle = vectorsBetweenAffectingParticle;
+                            }
+                        }
                     }
-                    
                 });
                 tasks.Add(task);
             }
@@ -693,7 +713,7 @@ namespace DisasterSimulation
 
         static void AddParticles(List<Particle> particles, uint lastUsedId)
         {
-            for (int z = 0; z <= 10; z += 3)
+            for (int z = 420; z <= 2303; z += 3)
             {
                 for (int y = 45; y <= 50; y += 3)
                 {
