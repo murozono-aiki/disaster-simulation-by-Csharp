@@ -13,7 +13,4 @@
     <SourceRoot Include="C:\Users\muroz\.nuget\packages\" />
     <SourceRoot Include="C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages\" />
   </ItemGroup>
-  <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <PkgAlea Condition=" '$(PkgAlea)' == '' ">C:\Users\muroz\.nuget\packages\alea\3.0.4</PkgAlea>
-  </PropertyGroup>
 </Project>
