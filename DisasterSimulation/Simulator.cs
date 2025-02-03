@@ -594,6 +594,222 @@ namespace DisasterSimulation
             return Task.WhenAll(tasks);
         }
 
+        void filterParticleByX(bool[] resultArray, int[] sortedParticleIndexArray, double min, double max, string axis)
+        {
+            int start = 0;
+            int end = sortedParticleIndexArray.Length - 1;
+            int middle = start + (int)Math.Round((end - start) / 2d);
+            int count = 0;
+            while (start > end && !(min <= _particles[sortedParticleIndexArray[middle]].position.X && _particles[sortedParticleIndexArray[middle]].position.X <= max))
+            {
+                if (_particles[sortedParticleIndexArray[middle]].position.X < min)
+                {
+                    start = middle + 1;
+                }
+                if (max < _particles[sortedParticleIndexArray[middle]].position.X)
+                {
+                    end = middle - 1;
+                }
+                middle = start + (int)Math.Round((end - start) / 2d);
+                count++;
+                if (count >= 10000) throw new Exception("無限ループ");
+            }
+
+            int start_min = start;
+            int end_min = middle;
+            start = (int)Math.Floor((end_min - start_min) / 2d);
+            count = 0;
+            while (start > 0 && !(_particles[sortedParticleIndexArray[start]].position.X >= min && _particles[sortedParticleIndexArray[start - 1]].position.X < min))
+            {
+                if (_particles[sortedParticleIndexArray[start]].position.X < min)
+                {
+                    start_min = start + 1;
+                }
+                if (_particles[sortedParticleIndexArray[start]].position.X > min)
+                {
+                    end_min = start - 1;
+                }
+                start = start_min + (int)Math.Floor((end_min - start_min) / 2d);
+                count++;
+                if (count >= 10000) throw new Exception("無限ループ");
+            }
+
+            int start_max = middle;
+            int end_max = end;
+            end = start_max + (int)Math.Ceiling((end_max - start_max) / 2d);
+            count = 0;
+            while (end < sortedParticleIndexArray.Length - 1 && !(_particles[sortedParticleIndexArray[end]].position.X <= max && _particles[sortedParticleIndexArray[end + 1]].position.X> max))
+            {
+                if (_particles[sortedParticleIndexArray[end]].position.X < max)
+                {
+                    start_max = end + 1;
+                }
+                if (_particles[sortedParticleIndexArray[end]].position.X > max)
+                {
+                    end_max = end - 1;
+                }
+                end = start_max + (int)Math.Ceiling((end_max - start_max) / 2d);
+                count++;
+                if (count >= 10000) throw new Exception("無限ループ");
+            }
+
+            for (int i = 0; i < start; i++)
+            {
+                resultArray[sortedParticleIndexArray[i]] = false;
+            }
+            /*for (int i = start; i <= end; i++)
+            {
+                ;
+            }*/
+            for (int i = end; i < sortedParticleIndexArray.Length; i++)
+            {
+                resultArray[sortedParticleIndexArray[i]] = false;
+            }
+        }
+        void filterParticleByY(bool[] resultArray, int[] sortedParticleIndexArray, double min, double max, string axis)
+        {
+            int start = 0;
+            int end = sortedParticleIndexArray.Length - 1;
+            int middle = start + (int)Math.Round((end - start) / 2d);
+            int count = 0;
+            while (start > end && !(min <= _particles[sortedParticleIndexArray[middle]].position.Y && _particles[sortedParticleIndexArray[middle]].position.Y <= max))
+            {
+                if (_particles[sortedParticleIndexArray[middle]].position.Y < min)
+                {
+                    start = middle + 1;
+                }
+                if (max < _particles[sortedParticleIndexArray[middle]].position.Y)
+                {
+                    end = middle - 1;
+                }
+                middle = start + (int)Math.Round((end - start) / 2d);
+                count++;
+                if (count >= 10000) throw new Exception("無限ループ");
+            }
+
+            int start_min = start;
+            int end_min = middle;
+            start = (int)Math.Floor((end_min - start_min) / 2d);
+            count = 0;
+            while (start > 0 && !(_particles[sortedParticleIndexArray[start]].position.Y >= min && _particles[sortedParticleIndexArray[start - 1]].position.Y < min))
+            {
+                if (_particles[sortedParticleIndexArray[start]].position.Y < min)
+                {
+                    start_min = start + 1;
+                }
+                if (_particles[sortedParticleIndexArray[start]].position.Y > min)
+                {
+                    end_min = start - 1;
+                }
+                start = start_min + (int)Math.Floor((end_min - start_min) / 2d);
+                count++;
+                if (count >= 10000) throw new Exception("無限ループ");
+            }
+
+            int start_max = middle;
+            int end_max = end;
+            end = start_max + (int)Math.Ceiling((end_max - start_max) / 2d);
+            count = 0;
+            while (end < sortedParticleIndexArray.Length - 1 && !(_particles[sortedParticleIndexArray[end]].position.Y <= max && _particles[sortedParticleIndexArray[end + 1]].position.Y > max))
+            {
+                if (_particles[sortedParticleIndexArray[end]].position.Y < max)
+                {
+                    start_max = end + 1;
+                }
+                if (_particles[sortedParticleIndexArray[end]].position.Y > max)
+                {
+                    end_max = end - 1;
+                }
+                end = start_max + (int)Math.Ceiling((end_max - start_max) / 2d);
+                count++;
+                if (count >= 10000) throw new Exception("無限ループ");
+            }
+
+            for (int i = 0; i < start; i++)
+            {
+                resultArray[sortedParticleIndexArray[i]] = false;
+            }
+            /*for (int i = start; i <= end; i++)
+            {
+                ;
+            }*/
+            for (int i = end; i < sortedParticleIndexArray.Length; i++)
+            {
+                resultArray[sortedParticleIndexArray[i]] = false;
+            }
+        }
+        void filterParticleByZ(bool[] resultArray, int[] sortedParticleIndexArray, double min, double max, string axis)
+        {
+            int start = 0;
+            int end = sortedParticleIndexArray.Length - 1;
+            int middle = start + (int)Math.Round((end - start) / 2d);
+            int count = 0;
+            while (start > end && !(min <= _particles[sortedParticleIndexArray[middle]].position.Z && _particles[sortedParticleIndexArray[middle]].position.Z <= max))
+            {
+                if (_particles[sortedParticleIndexArray[middle]].position.Z < min)
+                {
+                    start = middle + 1;
+                }
+                if (max < _particles[sortedParticleIndexArray[middle]].position.Z)
+                {
+                    end = middle - 1;
+                }
+                middle = start + (int)Math.Round((end - start) / 2d);
+                count++;
+                if (count >= 10000) throw new Exception("無限ループ");
+            }
+
+            int start_min = start;
+            int end_min = middle;
+            start = (int)Math.Floor((end_min - start_min) / 2d);
+            count = 0;
+            while (start > 0 && !(_particles[sortedParticleIndexArray[start]].position.Z >= min && _particles[sortedParticleIndexArray[start - 1]].position.Z < min))
+            {
+                if (_particles[sortedParticleIndexArray[start]].position.Z < min)
+                {
+                    start_min = start + 1;
+                }
+                if (_particles[sortedParticleIndexArray[start]].position.Z > min)
+                {
+                    end_min = start - 1;
+                }
+                start = start_min + (int)Math.Floor((end_min - start_min) / 2d);
+                count++;
+                if (count >= 10000) throw new Exception("無限ループ");
+            }
+
+            int start_max = middle;
+            int end_max = end;
+            end = start_max + (int)Math.Ceiling((end_max - start_max) / 2d);
+            count = 0;
+            while (end < sortedParticleIndexArray.Length - 1 && !(_particles[sortedParticleIndexArray[end]].position.Z <= max && _particles[sortedParticleIndexArray[end + 1]].position.Z > max))
+            {
+                if (_particles[sortedParticleIndexArray[end]].position.Z < max)
+                {
+                    start_max = end + 1;
+                }
+                if (_particles[sortedParticleIndexArray[end]].position.Z > max)
+                {
+                    end_max = end - 1;
+                }
+                end = start_max + (int)Math.Ceiling((end_max - start_max) / 2d);
+                count++;
+                if (count >= 10000) throw new Exception("無限ループ");
+            }
+
+            for (int i = 0; i < start; i++)
+            {
+                resultArray[sortedParticleIndexArray[i]] = false;
+            }
+            /*for (int i = start; i <= end; i++)
+            {
+                ;
+            }*/
+            for (int i = end; i < sortedParticleIndexArray.Length; i++)
+            {
+                resultArray[sortedParticleIndexArray[i]] = false;
+            }
+        }
         static bool Is_inside(Vector3 position, FaceData point)
         {
             for (int i = 0; i < point.InsideJudges.Count; i++)
@@ -608,6 +824,42 @@ namespace DisasterSimulation
         Task CalcColiderTerm(List<Particle> particles)
         {
             List<Task> tasks = [];
+            List<Particle> particles_sortX = new List<Particle>(particles);
+            particles_sortX.Sort((a, b) => 
+            {
+                double result = a.position.X - b.position.X;
+                if (result < 0) {
+                    return -1;
+                }
+                if (result > 0) {
+                    return 1;
+                }
+                return 0;
+            });
+            List<Particle> particles_sortY = new List<Particle>(particles);
+            particles_sortY.Sort((a, b) => 
+            {
+                double result = a.position.Y - b.position.Y;
+                if (result < 0) {
+                    return -1;
+                }
+                if (result > 0) {
+                    return 1;
+                }
+                return 0;
+            });
+            List<Particle> particles_sortZ = new List<Particle>(particles);
+            particles_sortZ.Sort((a, b) => 
+            {
+                double result = a.position.Z - b.position.Z;
+                if (result < 0) {
+                    return -1;
+                }
+                if (result > 0) {
+                    return 1;
+                }
+                return 0;
+            });
             for (int i = 0; i < particles.Count; i++)
             {
                 int index = i;
@@ -653,13 +905,20 @@ namespace DisasterSimulation
                 }
             }
             //粒子ごとに影響を与える粒子の配列を求める
+            Console.WriteLine("CalcAffectingParticles");
             CalcAffectingParticles(h,_particles, _particleXwithId, _particleYwithId, _particleZwithId).Wait();
+            Console.WriteLine("CalcDensity");
             CalcDensity(_particles).Wait();
+            Console.WriteLine("CalcPressure");
             CalcPressure(_particles).Wait();
+            Console.WriteLine("CalcPressureTerm");
             CalcPressureTerm(_particles).Wait();
+            Console.WriteLine("CalcViscosityTerm");
             CalcViscosityTerm(_particles).Wait();
+            Console.WriteLine("CalcColiderTerm");
             CalcColiderTerm(_particles).Wait();
 
+            Console.WriteLine("Result");
             List<Vector3?> tickResult = [];
             for (int i = 0; i < _particles.Count; i++)
             {
