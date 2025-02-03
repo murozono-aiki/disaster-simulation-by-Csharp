@@ -62,6 +62,16 @@ namespace DisasterSimulation
         }
     }
 
+    internal class FaceDataInfo
+    {
+        public double maxX = double.NegativeInfinity;
+        public double minX = double.PositiveInfinity;
+        public double maxY = double.NegativeInfinity;
+        public double minY = double.PositiveInfinity;
+        public double maxZ = double.NegativeInfinity;
+        public double minZ = double.PositiveInfinity;
+    }
+
     internal class Simulator(FaceData[] data)
     {
         public class Particle
@@ -782,6 +792,68 @@ namespace DisasterSimulation
             //makeWall(_particles);
 
             Console.WriteLine("シミュレーション開始");
+
+            double height = 5;  // 最大食い込み量（食い込んでいる面を特定するために用いる）←createFaces.jsと同じ値を用いること
+            for (int i = 0; i < data.Length; i++)
+            {
+                dataInfo[i] = new();
+                FaceData point = data[i];
+                Vector3 heightVector = Vector3Utility.MultiplyScalarVector3(point.NormalVector, -height);
+                for (int j = 0; j < point.Triangle.Length; j++)
+                {
+                    Vector3 point1 = point.Triangle[j];
+                    Vector3 point2 = Vector3Utility.AddVector3(point.Triangle[j], heightVector);
+                    if (point1.X < dataInfo[i].minX)
+                    {
+                        dataInfo[i].minX = point1.X;
+                    }
+                    if (point1.X > dataInfo[i].maxX)
+                    {
+                        dataInfo[i].maxX = point1.X;
+                    }
+                    if (point1.Y < dataInfo[i].minY)
+                    {
+                        dataInfo[i].minY = point1.Y;
+                    }
+                    if (point1.Y > dataInfo[i].maxY)
+                    {
+                        dataInfo[i].maxY = point1.Y;
+                    }
+                    if (point1.Z < dataInfo[i].minZ)
+                    {
+                        dataInfo[i].minZ = point1.Z;
+                    }
+                    if (point1.Z > dataInfo[i].maxZ)
+                    {
+                        dataInfo[i].maxZ = point1.Z;
+                    }
+                    if (point2.X < dataInfo[i].minX)
+                    {
+                        dataInfo[i].minX = point2.X;
+                    }
+                    if (point2.X > dataInfo[i].maxX)
+                    {
+                        dataInfo[i].maxX = point2.X;
+                    }
+                    if (point2.Y < dataInfo[i].minY)
+                    {
+                        dataInfo[i].minY = point2.Y;
+                    }
+                    if (point2.Y > dataInfo[i].maxY)
+                    {
+                        dataInfo[i].maxY = point2.Y;
+                    }
+                    if (point2.Z < dataInfo[i].minZ)
+                    {
+                        dataInfo[i].minZ = point2.Z;
+                    }
+                    if (point2.Z > dataInfo[i].maxZ)
+                    {
+                        dataInfo[i].maxZ = point2.Z;
+                    }
+                }
+            }
+            
             for (int i = 0; i < simulateSeconds / deltaTime; i++)
             {
                 if (i % 3  == 0)
