@@ -103,8 +103,11 @@ namespace DisasterSimulation
         internal List<Result> result = [];
 
         readonly FaceData[] data = data;
+        FaceDataInfo[] dataInfo = new FaceDataInfo[data.Length];
 
         readonly Dictionary<int, Term> terms = [];
+
+        readonly static double tsunamiSpeed = 10;
 
         readonly static double numberOfNearParticle = 12;
 
@@ -270,7 +273,7 @@ namespace DisasterSimulation
                                 LowerLimitIndex = selectedIndex;
                             }
                         }
-                        for (int j = LowerLimitIndex; j <= UpperLimitIndex; j++)
+                        for (int j = smallestParticleInAffect_Index; j <= largestParticleInAffect_Index; j++)
                         {
                             selectedIdList.Add(particleXwithId[j].id);
                         }
@@ -368,11 +371,24 @@ namespace DisasterSimulation
                                 LowerLimitIndex = selectedIndex;
                             }
                         }
-                        for (int j = LowerLimitIndex; j <= UpperLimitIndex; j++)
+                        int Loop_containListRemove_Adder = 1;
+                        bool alsoSelected = false;
+                        for (int j = 0; j < selectedIdList.Count; j += Loop_containListRemove_Adder)
                         {
-                            if (selectedIdList.Contains(particleYwithId[j].id) == false)
+                            alsoSelected = false;
+                            Loop_containListRemove_Adder = 1;
+                            for (int k = smallestParticleInAffect_Index; k <= largestParticleInAffect_Index; k++)
                             {
-                                selectedIdList.Remove(particleYwithId[j].id);
+                                if (selectedIdList[j] == particleYwithId[k].id)
+                                {
+                                    alsoSelected = true;
+                                    break;
+                                }
+                            }
+                            if (!alsoSelected)
+                            {
+                                selectedIdList.RemoveAt(j);
+                                Loop_containListRemove_Adder = 0;
                             }
                         }
 
@@ -448,28 +464,66 @@ namespace DisasterSimulation
                                 LowerLimitIndex = selectedIndex;
                             }
                         }
-                        for (int j = LowerLimitIndex; j <= UpperLimitIndex; j++)
+                        for (int j = 0; j < selectedIdList.Count; j += Loop_containListRemove_Adder)
                         {
-                            if (selectedIdList.Contains(particleZwithId[j].id) == false)
+                            alsoSelected = false;
+                            Loop_containListRemove_Adder = 1;
+                            for (int k = smallestParticleInAffect_Index; k <= largestParticleInAffect_Index; k++)
                             {
-                                selectedIdList.Remove(selectedZParticleDatas[j].id);
+                                if (selectedIdList[j] == particleZwithId[k].id)
+                                {
+                                    alsoSelected = true;
+                                    break;
+                                }
+                            }
+                            if (!alsoSelected)
+                            {
+                                selectedIdList.RemoveAt(j);
+                                Loop_containListRemove_Adder = 0;
                             }
                         }
                         List<double> distancesBetweenSelectedParticle = new();
                         List<int> selectedParticleIndex = new();
                         List<Vector3> vectorsBetweenAffectingParticle = new();
-                        for (int j = 0; j < selectedIdList.Count; j++)
+                        double h2 = h * h;
+                        for (int j = 0; j < selectedIdList.Count; j += Loop_containListRemove_Adder)
                         {
-                            Vector3 diff = Vector3Utility.SubVector3(particles.Find(n => n.id == selectedIdList[j]).position, particles[i].position); //粒子距離
+
+
+
+                            Loop_containListRemove_Adder = 1;
+                            //particleはAddParticleを通して増加する場合、常にidが小さい順に並んでいて、必ず現在注目している粒子が存在することが保証されているので、二分探索を用いる
+                            selectedIndex = 0;
+                            UpperLimitIndex = particles.Count;
+                            LowerLimitIndex = 0;
+                            while (true)
+                            {
+                                selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
+                                if (selectedIdList[j] == particles[selectedIndex].id)
+                                {
+                                    break;
+                                }
+                                else if (selectedIdList[j] < particles[selectedIndex].id)
+                                {
+                                    UpperLimitIndex = selectedIndex;
+                                }
+                                else
+                                {
+                                    LowerLimitIndex = selectedIndex;
+                                }
+                            }
+
+
+                            Vector3 diff = Vector3Utility.SubVector3(particles[selectedIndex].position, particles[i].position); //粒子距離
                             double r2 = Vector3Utility.DotVector3(diff, diff); //粒子距離の２乗
-                            if (r2 >= h * h)
+                            if (r2 >= h2)
                             {
                                 selectedIdList.Remove(selectedIdList[j]);
-
+                                Loop_containListRemove_Adder = 0;
                             }
                             else
                             {
-                                selectedParticleIndex.Add(particles.IndexOf(particles.Find(n => n.id == selectedIdList[j])));
+                                selectedParticleIndex.Add(selectedIndex);
                                 distancesBetweenSelectedParticle.Add(Math.Sqrt(r2));
                                 vectorsBetweenAffectingParticle.Add(diff);
                             }
@@ -719,19 +773,20 @@ namespace DisasterSimulation
             return [.. tickResult];
         }
 
-        static void AddParticles(List<Particle> particles, uint lastUsedId)
+        static void AddParticles(List<Particle> particles, ref uint lastUsedId)
         {
-            for (double z = /*1000*/420; z <= /*1007*/2303; z += particleDistance)
+            Vector3 tsunamiVelocity = Vector3Utility.MultiplyScalarVector3(Vector3Utility.NormalizeVector3(new Vector3(0.72342719346605268235776097708833, 0, 1)), tsunamiSpeed);
+            for (double z = -1288; z <= 1155; z += particleDistance)
             {
-                for (double y = 45; y <= 50; y += particleDistance)
+                for (double y = 38; y <= 43; y += particleDistance)
                 {
                     Particle particle = new()
                     {
-                        position = new Vector3(-700, y, z),
-                        velocity = new Vector3(10, 0, 0),
+                        position = new Vector3(0.72342719346605268235776097708833 * z - 582.38286403266973658821119511456, y, z),
+                        velocity = tsunamiVelocity,
                         id = lastUsedId
                     };
-                    lastUsedId = lastUsedId++;
+                    lastUsedId = lastUsedId + 1;
                     particles.Add(particle);
                 }
             }
@@ -858,7 +913,7 @@ namespace DisasterSimulation
             {
                 if (i % 3  == 0)
                 {
-                    AddParticles(_particles, lastUsedId);
+                    AddParticles(_particles, ref lastUsedId);
                 }
                 SortParticlesOnStart(_particles, _particleXwithId, "x");
                 SortParticlesOnStart(_particles, _particleYwithId, "y");
