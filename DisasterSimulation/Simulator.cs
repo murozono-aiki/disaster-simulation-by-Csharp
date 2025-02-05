@@ -63,6 +63,16 @@ namespace DisasterSimulation
         }
     }
 
+    internal class FaceDataInfo
+    {
+        public double maxX = double.NegativeInfinity;
+        public double minX = double.PositiveInfinity;
+        public double maxY = double.NegativeInfinity;
+        public double minY = double.PositiveInfinity;
+        public double maxZ = double.NegativeInfinity;
+        public double minZ = double.PositiveInfinity;
+    }
+
     internal class Simulator(FaceData[] data)
     {
         public class Particle
@@ -94,6 +104,7 @@ namespace DisasterSimulation
         internal List<Result> result = [];
 
         readonly FaceData[] data = data;
+        FaceDataInfo[] dataInfo = new FaceDataInfo[data.Length];
 
         readonly Dictionary<int, Term> terms = [];
 
@@ -143,20 +154,6 @@ namespace DisasterSimulation
                     List<ParticlePositionInSingleDirectionWithId> selectedZParticleDatas = new();
                     selfId = particles[i].id;
                     List<uint> selectedIdList = new List<uint>();
-                    //今日のやり残しメモ
-                    /*
-                     * ・演算対象が自分だった場合をID使って除外しよう
-                     * ・二分探索で求める値が粒子位置の最大値から最小値の範囲外にある場合は、
-                     * 　影響内の粒子がない(UpperもLowerも外)
-                     * 　ある程度はある(片方が範囲内)
-                     * 　に分けてしっかり設定しよう
-                     * 　もう一つ言うなら、最後に積集合を取るのならば、ｘ以降の計算はあらかじめｘで範囲内にあった粒子のみで行えるのではないだろうか
-                     * 　多分
-                     * 　・Xで得たIDの配列を回して、YのIDで一致するやつを探す
-                     * 　・一致するやつをそのまま新しいYの配列に追加(最後尾置き)していく
-                     * 　同じようなことをY後、Zでもやる
-                     * 
-                     */
 
                     //影響境界が粒子群の内部にあることを確認する
                     if (particles[i].position.X - h > particleXwithId[particleXwithId.Count - 1].pos)
@@ -185,9 +182,6 @@ namespace DisasterSimulation
                     }
                     else
                     {
-
-
-
                         //X軸での下限を求める
                         mainNumInSearching = particles[i].position.X - h;
                         UpperLimitIndex = particleXwithId.Count - 1;
@@ -209,8 +203,6 @@ namespace DisasterSimulation
                                 break;
                             }
                             selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
-                            //UpperとLowerはそれぞれ設定する際に、下手にインデックスずらさない
-                            //これに従うと必ず最後は２つまで(UpperとLowerが隣接するところまで)行けるので、そこで二分探索を終了して、どちらを含めるかとかをやる
                             if (particleXwithId[selectedIndex].pos == mainNumInSearching)
                             {
                                 smallestParticleInAffect_Index = selectedIndex;
@@ -246,8 +238,6 @@ namespace DisasterSimulation
                                 break;
                             }
                             selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
-                            //UpperとLowerはそれぞれ設定する際に、下手にインデックスずらさない
-                            //これに従うと必ず最後は２つまで(UpperとLowerが隣接するところまで)行けるので、そこで二分探索を終了して、どちらを含めるかとかをやる
                             if (particleXwithId[selectedIndex].pos == mainNumInSearching)
                             {
                                 largestParticleInAffect_Index = selectedIndex;
@@ -262,30 +252,17 @@ namespace DisasterSimulation
                                 LowerLimitIndex = selectedIndex;
                             }
                         }
-                        for (int j = LowerLimitIndex; j <= UpperLimitIndex; j++)
+                        for (int j = smallestParticleInAffect_Index; j <= largestParticleInAffect_Index; j++)
                         {
                             selectedIdList.Add(particleXwithId[j].id);
                         }
-                        if (selectedIdList.Contains(selfId))
-                        {
-                            selectedIdList.Remove(selfId);
-                        }
-                        /*
-                        List<int> selectedYIndex = new List<int>();
                         for (int j = 0; j < selectedIdList.Count; j++)
                         {
-                            for (int k = 0; k < particleYwithId.Count; k++)
+                            if (selectedIdList[j] == selfId)
                             {
-                                if (selectedIdList[j] == particleYwithId[k].id)
-                                {
-                                    selectedYIndex.Add(k);
-                                    break;
-                                }
+                                selectedIdList.RemoveAt(j);
                             }
                         }
-                        selectedYIndex.Sort();
-                        */
-
 
 
                         //Y軸での下限を求める
@@ -308,8 +285,6 @@ namespace DisasterSimulation
                                 break;
                             }
                             selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
-                            //UpperとLowerはそれぞれ設定する際に、下手にインデックスずらさない
-                            //これに従うと必ず最後は２つまで(UpperとLowerが隣接するところまで)行けるので、そこで二分探索を終了して、どちらを含めるかとかをやる
                             if (particleYwithId[selectedIndex].pos == mainNumInSearching)
                             {
                                 smallestParticleInAffect_Index = selectedIndex;
@@ -344,8 +319,6 @@ namespace DisasterSimulation
                                 break;
                             }
                             selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
-                            //UpperとLowerはそれぞれ設定する際に、下手にインデックスずらさない
-                            //これに従うと必ず最後は２つまで(UpperとLowerが隣接するところまで)行けるので、そこで二分探索を終了して、どちらを含めるかとかをやる
                             if (particleYwithId[selectedIndex].pos == mainNumInSearching)
                             {
                                 largestParticleInAffect_Index = selectedIndex;
@@ -360,11 +333,24 @@ namespace DisasterSimulation
                                 LowerLimitIndex = selectedIndex;
                             }
                         }
-                        for (int j = LowerLimitIndex; j <= UpperLimitIndex; j++)
+                        int Loop_containListRemove_Adder = 1;
+                        bool alsoSelected = false;
+                        for (int j = 0; j < selectedIdList.Count; j += Loop_containListRemove_Adder)
                         {
-                            if (selectedIdList.Contains(particleYwithId[j].id) == false)
+                            alsoSelected = false;
+                            Loop_containListRemove_Adder = 1;
+                            for (int k = smallestParticleInAffect_Index; k <= largestParticleInAffect_Index; k++)
                             {
-                                selectedIdList.Remove(particleYwithId[j].id);
+                                if (selectedIdList[j] == particleYwithId[k].id)
+                                {
+                                    alsoSelected = true;
+                                    break;
+                                }
+                            }
+                            if (!alsoSelected)
+                            {
+                                selectedIdList.RemoveAt(j);
+                                Loop_containListRemove_Adder = 0;
                             }
                         }
 
@@ -388,8 +374,6 @@ namespace DisasterSimulation
                                 break;
                             }
                             selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
-                            //UpperとLowerはそれぞれ設定する際に、下手にインデックスずらさない
-                            //これに従うと必ず最後は２つまで(UpperとLowerが隣接するところまで)行けるので、そこで二分探索を終了して、どちらを含めるかとかをやる
                             if (particleZwithId[selectedIndex].pos == mainNumInSearching)
                             {
                                 smallestParticleInAffect_Index = selectedIndex;
@@ -424,8 +408,6 @@ namespace DisasterSimulation
                                 break;
                             }
                             selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
-                            //UpperとLowerはそれぞれ設定する際に、下手にインデックスずらさない
-                            //これに従うと必ず最後は２つまで(UpperとLowerが隣接するところまで)行けるので、そこで二分探索を終了して、どちらを含めるかとかをやる
                             if (particleZwithId[selectedIndex].pos == mainNumInSearching)
                             {
                                 largestParticleInAffect_Index = selectedIndex;
@@ -440,29 +422,65 @@ namespace DisasterSimulation
                                 LowerLimitIndex = selectedIndex;
                             }
                         }
-                        for (int j = LowerLimitIndex; j <= UpperLimitIndex; j++)
+                        for (int j = 0; j < selectedIdList.Count; j += Loop_containListRemove_Adder)
                         {
-                            if (selectedIdList.Contains(particleZwithId[j].id) == false)
+                            alsoSelected = false;
+                            Loop_containListRemove_Adder = 1;
+                            for (int k = smallestParticleInAffect_Index; k <= largestParticleInAffect_Index; k++)
                             {
-                                selectedIdList.Remove(selectedZParticleDatas[j].id);
+                                if (selectedIdList[j] == particleZwithId[k].id)
+                                {
+                                    alsoSelected = true;
+                                    break;
+                                }
+                            }
+                            if (!alsoSelected)
+                            {
+                                selectedIdList.RemoveAt(j);
+                                Loop_containListRemove_Adder = 0;
                             }
                         }
                         List<double> distancesBetweenSelectedParticle = new();
                         List<int> selectedParticleIndex = new();
                         List<Vector3> vectorsBetweenAffectingParticle = new();
                         double h2 = h * h;
-                        for (int j = 0; j < selectedIdList.Count; j++)
+                        for (int j = 0; j < selectedIdList.Count; j += Loop_containListRemove_Adder)
                         {
-                            Vector3 diff = Vector3Utility.SubVector3(particles.Find(n => n.id == selectedIdList[j]).position, particles[i].position); //粒子距離
+
+                            Loop_containListRemove_Adder = 1;
+                            //particleはAddParticleを通して増加する場合、常にidが小さい順に並んでいて、必ず現在注目している粒子が存在することが保証されているので、二分探索を用いる
+                            selectedIndex = 0;
+                            UpperLimitIndex = particles.Count;
+                            LowerLimitIndex = 0;
+                            while (true)
+                            {
+                                selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
+                                if (selectedIdList[j] == particles[selectedIndex].id)
+                                {
+                                    break;
+                                }
+                                else if (selectedIdList[j] < particles[selectedIndex].id)
+                                {
+                                    UpperLimitIndex = selectedIndex;
+                                }
+                                else
+                                {
+                                    LowerLimitIndex = selectedIndex;
+                                }
+                            }
+
+
+                            Vector3 diff = Vector3Utility.SubVector3(particles[selectedIndex].position, particles[i].position); //粒子距離
+                            //これってベクトルの向きが注目粒子から影響半径内の粒子へ　になってるけど大丈夫なのか
                             double r2 = Vector3Utility.DotVector3(diff, diff); //粒子距離の２乗
-                            if (r2 >= h2)
+                            if (r2 >= h2 || r2 == 0)
                             {
                                 selectedIdList.Remove(selectedIdList[j]);
-
+                                Loop_containListRemove_Adder = 0;
                             }
                             else
                             {
-                                selectedParticleIndex.Add(particles.IndexOf(particles.Find(n => n.id == selectedIdList[j])));
+                                selectedParticleIndex.Add(selectedIndex);
                                 distancesBetweenSelectedParticle.Add(Math.Sqrt(r2));
                                 vectorsBetweenAffectingParticle.Add(diff);
                             }
@@ -496,7 +514,7 @@ namespace DisasterSimulation
                         double c = h2 - r2;
                         sum += Math.Pow(c, 3);
                     }
-
+                    
                     nowParticle.density = sum * densityCoef; //密度が求まった
                 });
                 tasks.Add(task);
@@ -516,7 +534,6 @@ namespace DisasterSimulation
                     if (pressure >= 0)
                     {
                         particles[index].pressure = pressure;
-                        //Console.WriteLine(pressure);
                     }
                     else
                     {
@@ -548,7 +565,6 @@ namespace DisasterSimulation
                         +nowParticle.pressure) / (2 * particles[nowParticle.affectingParticleIndex[j]].density)) * Math.Pow(c, 2) / r;
                         sum = Vector3Utility.AddVector3(sum, Vector3Utility.MultiplyScalarVector3(nowParticle.vectorsBetweenAffectingParticle[j], n));
                     }
-
                     terms[index].pressureTerm = Vector3Utility.MultiplyScalarVector3(sum, (-1/*/nowParticle.pressure*/) * pressureCoef);  // 圧力項が求まった
                     //Console.WriteLine($"{terms[index].pressureTerm.X},{terms[index].pressureTerm.Y},{terms[index].pressureTerm.Z}");
                 });
@@ -595,33 +611,339 @@ namespace DisasterSimulation
             /*const dot = dotVector3(point.normalVector, subVector3(position, point.centerOfGravity));
             return dot <= 0;*/
         }
-        Task CalcColiderTerm(List<Particle> particles)
+        Task CalcColiderTerm(List<Particle> particles, List<ParticlePositionInSingleDirectionWithId> particleXwithId, List<ParticlePositionInSingleDirectionWithId> particleYwithId, List<ParticlePositionInSingleDirectionWithId> particleZwithId)
         {
             List<Task> tasks = [];
-            for (int i = 0; i < particles.Count; i++)
+            //前回の演算の引き継ぎを防ぐために、termのColliderTermを初期化
+            for (int i = 0; i < terms.Count; i++)
+            {
+                terms[i].coliderTerm = new Vector3();
+            }
+
+            for(int i = 0; i < data.Length; i++)
             {
                 int index = i;
                 Task task = Task.Run(() =>
                 {
-                    Particle nowParticle = particles[index]; //今回計算する粒子
-                    Vector3 term = new();
+                    double mainNumInSearching;
+                    int selectedIndex = 0;
+                    int UpperLimitIndex;
+                    int LowerLimitIndex;
+                    List<ParticlePositionInSingleDirectionWithId> selectedYParticleDatas = new();
+                    List<ParticlePositionInSingleDirectionWithId> selectedZParticleDatas = new();
+                    List<uint> selectedIdList = new List<uint>();
 
-                    /*Dictionary<int, bool> filterArray = [];
-                    filterPoint(filterArray, data.normalVectors.sort.x, nowParticle.position.x - (-dampingCoefficient), nowParticle.position.x + (-dampingCoefficient), "x");
-                    filterPoint(filterArray, data.normalVectors.sort.y, nowParticle.position.y - (-dampingCoefficient), nowParticle.position.y + (-dampingCoefficient), "y");
-                    filterPoint(filterArray, data.normalVectors.sort.z, nowParticle.position.z - (-dampingCoefficient), nowParticle.position.z + (-dampingCoefficient), "z");*/
-                    for (int j = 0; j < data.Length; j++)
+                    //影響境界が粒子群の内部にあることを確認する
+                    if (dataInfo[index].minX > particleXwithId[particleXwithId.Count - 1].pos)
                     {
-                        //if (!filterArray[j]) continue;
-                        FaceData nowPoint = data[j];
-                        if (Is_inside(nowParticle.position, nowPoint))
+
+                    }
+                    else if (dataInfo[index].maxX < particleXwithId[0].pos)
+                    {
+
+                    }
+                    else if (dataInfo[index].minY > particleYwithId[particleYwithId.Count - 1].pos)
+                    {
+
+                    }
+                    else if (dataInfo[index].maxY < particleYwithId[0].pos)
+                    {
+
+                    }
+                    else if (dataInfo[index].minZ > particleZwithId[particleZwithId.Count - 1].pos)
+                    {
+
+                    }
+                    else if (dataInfo[index].maxZ < particleZwithId[0].pos)
+                    {
+
+                    }
+                    else
+                    {
+
+                        //X軸での下限を求める
+                        mainNumInSearching = dataInfo[index].minX;
+                        UpperLimitIndex = particleXwithId.Count - 1;
+                        LowerLimitIndex = 0;
+                        int smallestParticleInAffect_Index;
+                        while (true)
                         {
-                            double distance = Math.Abs(Vector3Utility.DotVector3(Vector3Utility.SubVector3(nowParticle.position, nowPoint.CenterOfGravity), nowPoint.NormalVector));
-                            Vector3 nowTerm = Vector3Utility.MultiplyScalarVector3(nowPoint.NormalVector, springConstant * distance + dampingCoefficient * Vector3Utility.DotVector3(nowParticle.velocity, nowPoint.NormalVector));
-                            term = Vector3Utility.AddVector3(term, nowTerm);
+                            if (UpperLimitIndex - LowerLimitIndex <= 1)
+                            {
+                                //探索終了
+                                if (particleXwithId[LowerLimitIndex].pos >= mainNumInSearching)
+                                {
+                                    smallestParticleInAffect_Index = LowerLimitIndex;
+                                }
+                                else
+                                {
+                                    smallestParticleInAffect_Index = UpperLimitIndex;
+                                }
+                                break;
+                            }
+                            selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
+                            if (particleXwithId[selectedIndex].pos == mainNumInSearching)
+                            {
+                                smallestParticleInAffect_Index = selectedIndex;
+                                break;
+                            }
+                            else if (particleXwithId[selectedIndex].pos < mainNumInSearching)
+                            {
+                                LowerLimitIndex = selectedIndex;
+                            }
+                            else
+                            {
+                                UpperLimitIndex = selectedIndex;
+                            }
+                        }
+                        //X軸での上限を求める
+                        mainNumInSearching = dataInfo[index].maxX;
+                        UpperLimitIndex = particleXwithId.Count - 1;
+                        LowerLimitIndex = 0;
+                        int largestParticleInAffect_Index;
+                        while (true)
+                        {
+                            if (UpperLimitIndex - LowerLimitIndex <= 1)
+                            {
+                                //探索終了
+                                if (particleXwithId[UpperLimitIndex].pos <= mainNumInSearching)
+                                {
+                                    largestParticleInAffect_Index = UpperLimitIndex;
+                                }
+                                else
+                                {
+                                    largestParticleInAffect_Index = LowerLimitIndex;
+                                }
+                                break;
+                            }
+                            selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
+                            if (particleXwithId[selectedIndex].pos == mainNumInSearching)
+                            {
+                                largestParticleInAffect_Index = selectedIndex;
+                                break;
+                            }
+                            else if (particleXwithId[selectedIndex].pos > mainNumInSearching)
+                            {
+                                UpperLimitIndex = selectedIndex;
+                            }
+                            else
+                            {
+                                LowerLimitIndex = selectedIndex;
+                            }
+                        }
+                        for (int j = smallestParticleInAffect_Index; j <= largestParticleInAffect_Index; j++)
+                        {
+                            selectedIdList.Add(particleXwithId[j].id);
+                        }
+                        //Y軸での下限を求める
+                        mainNumInSearching = dataInfo[index].minY;
+                        UpperLimitIndex = particleYwithId.Count - 1;
+                        LowerLimitIndex = 0;
+                        while (true)
+                        {
+                            if (UpperLimitIndex - LowerLimitIndex <= 1)
+                            {
+                                //探索終了
+                                if (particleYwithId[LowerLimitIndex].pos >= mainNumInSearching)
+                                {
+                                    smallestParticleInAffect_Index = LowerLimitIndex;
+                                }
+                                else
+                                {
+                                    smallestParticleInAffect_Index = UpperLimitIndex;
+                                }
+                                break;
+                            }
+                            selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
+                            if (particleYwithId[selectedIndex].pos == mainNumInSearching)
+                            {
+                                smallestParticleInAffect_Index = selectedIndex;
+                                break;
+                            }
+                            else if (particleYwithId[selectedIndex].pos < mainNumInSearching)
+                            {
+                                LowerLimitIndex = selectedIndex;
+                            }
+                            else
+                            {
+                                UpperLimitIndex = selectedIndex;
+                            }
+                        }
+                        //Y軸での上限を求める
+                        mainNumInSearching = dataInfo[index].maxY;
+                        UpperLimitIndex = particleYwithId.Count - 1;
+                        LowerLimitIndex = 0;
+                        while (true)
+                        {
+                            if (UpperLimitIndex - LowerLimitIndex <= 1)
+                            {
+                                //探索終了
+                                if (particleYwithId[UpperLimitIndex].pos <= mainNumInSearching)
+                                {
+                                    largestParticleInAffect_Index = UpperLimitIndex;
+                                }
+                                else
+                                {
+                                    largestParticleInAffect_Index = LowerLimitIndex;
+                                }
+                                break;
+                            }
+                            selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
+                            if (particleYwithId[selectedIndex].pos == mainNumInSearching)
+                            {
+                                largestParticleInAffect_Index = selectedIndex;
+                                break;
+                            }
+                            else if (particleYwithId[selectedIndex].pos > mainNumInSearching)
+                            {
+                                UpperLimitIndex = selectedIndex;
+                            }
+                            else
+                            {
+                                LowerLimitIndex = selectedIndex;
+                            }
+                        }
+                        int Loop_containListRemove_Adder = 1;
+                        bool alsoSelected = false;
+                        for (int j = 0; j < selectedIdList.Count; j += Loop_containListRemove_Adder)
+                        {
+                            alsoSelected = false;
+                            Loop_containListRemove_Adder = 1;
+                            for (int k = smallestParticleInAffect_Index; k <= largestParticleInAffect_Index; k++)
+                            {
+                                if (selectedIdList[j] == particleYwithId[k].id)
+                                {
+                                    alsoSelected = true;
+                                    break;
+                                }
+                            }
+                            if (!alsoSelected)
+                            {
+                                selectedIdList.RemoveAt(j);
+                                Loop_containListRemove_Adder = 0;
+                            }
+                        }
+
+                        //Z軸での下限を求める
+                        mainNumInSearching = dataInfo[index].minZ;
+                        UpperLimitIndex = particleZwithId.Count - 1;
+                        LowerLimitIndex = 0;
+                        while (true)
+                        {
+                            if (UpperLimitIndex - LowerLimitIndex <= 1)
+                            {
+                                //探索終了
+                                if (particleZwithId[LowerLimitIndex].pos >= mainNumInSearching)
+                                {
+                                    smallestParticleInAffect_Index = LowerLimitIndex;
+                                }
+                                else
+                                {
+                                    smallestParticleInAffect_Index = UpperLimitIndex;
+                                }
+                                break;
+                            }
+                            selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
+                            if (particleZwithId[selectedIndex].pos == mainNumInSearching)
+                            {
+                                smallestParticleInAffect_Index = selectedIndex;
+                                break;
+                            }
+                            else if (particleZwithId[selectedIndex].pos < mainNumInSearching)
+                            {
+                                LowerLimitIndex = selectedIndex;
+                            }
+                            else
+                            {
+                                UpperLimitIndex = selectedIndex;
+                            }
+                        }
+                        //Z軸での上限を求める
+                        mainNumInSearching = dataInfo[index].maxZ;
+                        UpperLimitIndex = particleZwithId.Count - 1;
+                        LowerLimitIndex = 0;
+                        while (true)
+                        {
+                            if (UpperLimitIndex - LowerLimitIndex <= 1)
+                            {
+                                //探索終了
+                                if (particleZwithId[UpperLimitIndex].pos <= mainNumInSearching)
+                                {
+                                    largestParticleInAffect_Index = UpperLimitIndex;
+                                }
+                                else
+                                {
+                                    largestParticleInAffect_Index = LowerLimitIndex;
+                                }
+                                break;
+                            }
+                            selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
+                            if (particleZwithId[selectedIndex].pos == mainNumInSearching)
+                            {
+                                largestParticleInAffect_Index = selectedIndex;
+                                break;
+                            }
+                            else if (particleZwithId[selectedIndex].pos > mainNumInSearching)
+                            {
+                                UpperLimitIndex = selectedIndex;
+                            }
+                            else
+                            {
+                                LowerLimitIndex = selectedIndex;
+                            }
+                        }
+                        for (int j = 0; j < selectedIdList.Count; j += Loop_containListRemove_Adder)
+                        {
+                            alsoSelected = false;
+                            Loop_containListRemove_Adder = 1;
+                            for (int k = smallestParticleInAffect_Index; k <= largestParticleInAffect_Index; k++)
+                            {
+                                if (selectedIdList[j] == particleZwithId[k].id)
+                                {
+                                    alsoSelected = true;
+                                    break;
+                                }
+                            }
+                            if (!alsoSelected)
+                            {
+                                selectedIdList.RemoveAt(j);
+                                Loop_containListRemove_Adder = 0;
+                            }
+                        }
+                        //idからindexを特定し、内在判定を行い、内在していれば反発力を計算する
+                        for (int j = 0; j < selectedIdList.Count; j += Loop_containListRemove_Adder)
+                        {
+                            Loop_containListRemove_Adder = 1;
+                            selectedIndex = 0;
+                            UpperLimitIndex = particles.Count;
+                            LowerLimitIndex = 0;
+                            while (true)
+                            {
+                                selectedIndex = (UpperLimitIndex + LowerLimitIndex) / 2;
+                                if (selectedIdList[j] == particles[selectedIndex].id)
+                                {
+                                    break;
+                                }
+                                else if (selectedIdList[j] < particles[selectedIndex].id)
+                                {
+                                    UpperLimitIndex = selectedIndex;
+                                }
+                                else
+                                {
+                                    LowerLimitIndex = selectedIndex;
+                                }
+                            }
+                            Vector3 term = new();
+                            //内在判定を行う
+                            if (Is_inside(particles[selectedIndex].position, data[index]))
+                            {
+                                double distance = Math.Abs(Vector3Utility.DotVector3(Vector3Utility.SubVector3(particles[selectedIndex].position, data[index].CenterOfGravity), data[index].NormalVector));
+                                Vector3 nowTerm = Vector3Utility.MultiplyScalarVector3(data[index].NormalVector, springConstant * distance + dampingCoefficient * Vector3Utility.DotVector3(particles[selectedIndex].velocity, data[index].NormalVector));
+                                term = Vector3Utility.AddVector3(term, nowTerm);
+                            }
+                            terms[selectedIndex].coliderTerm = term;
                         }
                     }
-                    terms[index].coliderTerm = term;
                 });
                 tasks.Add(task);
             }
@@ -649,7 +971,11 @@ namespace DisasterSimulation
             Console.WriteLine("CalcViscosityTerm");
             CalcViscosityTerm(_particles).Wait();
             Console.WriteLine("CalcColiderTerm");
-            CalcColiderTerm(_particles).Wait();
+            CalcColiderTerm(_particles,_particleXwithId,_particleYwithId,_particleZwithId).Wait();
+
+            _particleXwithId.Clear();
+            _particleYwithId.Clear();
+            _particleZwithId.Clear();
 
             Console.WriteLine("result");
             List<Vector3?> tickResult = [];
@@ -657,72 +983,23 @@ namespace DisasterSimulation
             {
                 Particle nowParticle = _particles[i];
                 //if (nowParticle.is_wall) continue;
-                //ここがおそらく粒子位置の計算
-                //ここで各方向の配列を並べ直したり、データの追加や消去を行う
-                _particleXwithId.Clear();
-                _particleYwithId.Clear();
-                _particleZwithId.Clear();
+                //粒子位置の計算
+                Vector3 a;
 
-
-                Vector3 a = Vector3Utility.AddVector3(Vector3Utility.AddVector3(Vector3Utility.AddVector3(terms[i].pressureTerm, terms[i].viscosityTerm), terms[i].coliderTerm), g);
+                a = Vector3Utility.AddVector3(Vector3Utility.AddVector3(Vector3Utility.AddVector3(terms[i].pressureTerm, terms[i].viscosityTerm), terms[i].coliderTerm), g);
                 Vector3 v = Vector3Utility.AddVector3(nowParticle.velocity, Vector3Utility.MultiplyScalarVector3(Vector3Utility.AddVector3(nowParticle.acceleration, a), 0.5 * deltaTime));
                 Vector3 deltaPosition = Vector3Utility.AddVector3(Vector3Utility.MultiplyScalarVector3(v, deltaTime), Vector3Utility.MultiplyScalarVector3(a, 0.5 * deltaTime * deltaTime));
                 nowParticle.acceleration = a;
                 nowParticle.velocity = v;
                 nowParticle.position = Vector3Utility.AddVector3(nowParticle.position, deltaPosition);
-                if (_particleXwithId.Count == 0)
-                {
-                    ParticlePositionInSingleDirectionWithId particlePosWithId_X = new()
-                    {
-                        pos = nowParticle.position.X,
-                        id = nowParticle.id
-                    };
-                    _particleXwithId.Add(particlePosWithId_X);
-                    ParticlePositionInSingleDirectionWithId particlePosWithId_Y = new()
-                    {
-                        pos = nowParticle.position.Y,
-                        id = nowParticle.id
-                    };
-                    _particleXwithId.Add(particlePosWithId_Y);
-                    ParticlePositionInSingleDirectionWithId particlePosWithId_Z = new()
-                    {
-                        pos = nowParticle.position.Z,
-                        id = nowParticle.id
-                    };
-                    _particleXwithId.Add(particlePosWithId_Z);
-                }
-                else
-                {
-                    //せっかく順番に並んでるんだから、二分探索をやったら速そう(まだやってないけど)
-                    ParticlePositionInSingleDirectionWithId particlePosWithId_X = new()
-                    {
-                        pos = nowParticle.position.X,
-                        id = nowParticle.id
-                    };
-                    _particleXwithId.Insert(_particleXwithId.FindIndex(n => n.pos >= nowParticle.position.X),particlePosWithId_X);
-                    ParticlePositionInSingleDirectionWithId particlePosWithId_Y = new()
-                    {
-                        pos = nowParticle.position.Y,
-                        id = nowParticle.id
-                    };
-                    _particleYwithId.Insert(_particleYwithId.FindIndex(n => n.pos >= nowParticle.position.Y), particlePosWithId_Y);
-                    ParticlePositionInSingleDirectionWithId particlePosWithId_Z = new()
-                    {
-                        pos = nowParticle.position.Z,
-                        id = nowParticle.id
-                    };
-                    _particleZwithId.Insert(_particleZwithId.FindIndex(n => n.pos >= nowParticle.position.Z), particlePosWithId_Z);
-                }
-                if (-1000000 < nowParticle.position.X && nowParticle.position.X < 1000000 && -1000000 < nowParticle.position.Y && nowParticle.position.Y < 1000000 && -1000000 < nowParticle.position.Z && nowParticle.position.Z < 1000000)  // 暫定的な措置
-                {
-                    tickResult.Add(nowParticle.position);
-                }
+                
+                tickResult.Add(nowParticle.position);
             }
             _particles.RemoveAll(particle => particle.position.Y <= 0);
             return [.. tickResult];
         }
 
-        static void AddParticles(List<Particle> particles, uint lastUsedId)
+        static void AddParticles(List<Particle> particles, ref uint lastUsedId)
         {
             Vector3 tsunamiVelocity = Vector3Utility.MultiplyScalarVector3(Vector3Utility.NormalizeVector3(new Vector3(0.72342719346605268235776097708833, 0, 1)), tsunamiSpeed);
             for (double z = -1288; z <= 1155; z += particleDistance)
@@ -735,7 +1012,7 @@ namespace DisasterSimulation
                         velocity = tsunamiVelocity,
                         id = lastUsedId
                     };
-                    lastUsedId = lastUsedId++;
+                    lastUsedId = lastUsedId + 1;
                     particles.Add(particle);
                 }
             }
@@ -789,6 +1066,7 @@ namespace DisasterSimulation
                 PPsISDWId[unSearchedRange - 1].id = largestPos_id;
                 unSearchedRange--;
             }
+
         }
         public void Start(double simulateSeconds)
         {
@@ -796,11 +1074,73 @@ namespace DisasterSimulation
             //makeWall(_particles);
 
             Console.WriteLine("シミュレーション開始");
+
+            double height = 5;  // 最大食い込み量（食い込んでいる面を特定するために用いる）←createFaces.jsと同じ値を用いること
+            for (int i = 0; i < data.Length; i++)
+            {
+                dataInfo[i] = new();
+                FaceData point = data[i];
+                Vector3 heightVector = Vector3Utility.MultiplyScalarVector3(point.NormalVector, -height);
+                for (int j = 0; j < point.Triangle.Length; j++)
+                {
+                    Vector3 point1 = point.Triangle[j];
+                    Vector3 point2 = Vector3Utility.AddVector3(point.Triangle[j], heightVector);
+                    if (point1.X < dataInfo[i].minX)
+                    {
+                        dataInfo[i].minX = point1.X;
+                    }
+                    if (point1.X > dataInfo[i].maxX)
+                    {
+                        dataInfo[i].maxX = point1.X;
+                    }
+                    if (point1.Y < dataInfo[i].minY)
+                    {
+                        dataInfo[i].minY = point1.Y;
+                    }
+                    if (point1.Y > dataInfo[i].maxY)
+                    {
+                        dataInfo[i].maxY = point1.Y;
+                    }
+                    if (point1.Z < dataInfo[i].minZ)
+                    {
+                        dataInfo[i].minZ = point1.Z;
+                    }
+                    if (point1.Z > dataInfo[i].maxZ)
+                    {
+                        dataInfo[i].maxZ = point1.Z;
+                    }
+                    if (point2.X < dataInfo[i].minX)
+                    {
+                        dataInfo[i].minX = point2.X;
+                    }
+                    if (point2.X > dataInfo[i].maxX)
+                    {
+                        dataInfo[i].maxX = point2.X;
+                    }
+                    if (point2.Y < dataInfo[i].minY)
+                    {
+                        dataInfo[i].minY = point2.Y;
+                    }
+                    if (point2.Y > dataInfo[i].maxY)
+                    {
+                        dataInfo[i].maxY = point2.Y;
+                    }
+                    if (point2.Z < dataInfo[i].minZ)
+                    {
+                        dataInfo[i].minZ = point2.Z;
+                    }
+                    if (point2.Z > dataInfo[i].maxZ)
+                    {
+                        dataInfo[i].maxZ = point2.Z;
+                    }
+                }
+            }
+            
             for (int i = 0; i < simulateSeconds / deltaTime; i++)
             {
                 if (i % 3  == 0)
                 {
-                    AddParticles(_particles, lastUsedId);
+                    AddParticles(_particles, ref lastUsedId);
                 }
                 SortParticlesOnStart(_particles, _particleXwithId, "x");
                 SortParticlesOnStart(_particles, _particleYwithId, "y");
